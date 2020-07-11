@@ -1,0 +1,19 @@
+{
+  "name": "streamer",
+  "version": "1.0.0",
+  "description": "App to stream video in lan",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vinnylg/streamer.git"
+  },
+  "author": "Vinícius de Lima Gonçalves",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vinnylg/streamer/issues"
+  },
+  "homepage": "https://github.com/vinnylg/streamer#readme"
+}
