@@ -15,21 +15,17 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.use(cors())
 
 app.get('/video', (req, res) => {
-    if (req.query.path && req.query.path.type)
-        services.sendVideo(
-            services.rootPath + req.query.path,
-            req.query.path.type,
-            req,
-            res
-        )
-    else res.status(404)
+    services.sendVideo('/home/vinny/Videos/' + req.query.path, req, res)
 })
 
 app.get('/list', (req, res) => {
-    const listPath = req.query.path
-    console.log(listPath)
-    const items = services.listItems(listPath)
-    res.json({ items })
+    try {
+        const listPath = req.query.path
+        const items = services.listItems(listPath)
+        res.json({ items })
+    } catch (err) {
+        res.status(404).json({ err })
+    }
 })
 
 module.exports = app

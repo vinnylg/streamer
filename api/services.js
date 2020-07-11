@@ -1,91 +1,64 @@
 var fs = require('fs')
 
-const videoExt = [
-    '.mpg',
-    '.mpeg',
-    '.avi',
-    '.wmv',
-    '.mov',
-    '.ogg',
-    '.webm',
-    '.mp4'
-]
-
-const containTerm = (str, terms) => {
-    for (let term of terms) if (str.toLowerCase().includes(term)) return true
-    return false
-}
+const videoExt = ['mpg', 'mpeg', 'avi', 'wmv', 'mov', 'ogg', 'webm', 'mp4']
 
 const rootPath = '/home/vinny/Videos'
 
 const listItems = path => {
-    if (fs.lstatSync(rootPath + path).isDirectory()) {
-        let raw = fs
-            .readdirSync(rootPath + path)
-            .filter(name => name != 'streamer' && name[0] != '.')
-        let items = []
-        raw.forEach(item => {
-            let stats = fs.lstatSync(rootPath + path + '/' + item)
-            if (stats.isFile()) {
-                if (containTerm(item, videoExt))
-                    items.push({ name: item, isVideo: 1 })
-            } else if (stats.isDirectory())
-                items.push({ name: item, isVideo: 0 })
-        })
-        return items
-    }
+    let raw = fs
+        .readdirSync(rootPath + path)
+        .filter(name => name != 'streamer' && name[0] != '.')
+    let items = []
+    raw.forEach((item, i) => {
+        let stats = fs.lstatSync(rootPath + path + '/' + item)
+        if (stats.isFile()) {
+            let name = item.split('.')
+            let type = name.pop()
+            name = name.join()
+            if (videoExt.includes(type))
+                items.push({ id: i, name, type, path: path + '/' + item })
+        } else if (stats.isDirectory())
+            items.push({
+                id: i,
+                name: item.replace('-', ' ').toUpperCase(),
+                type: 'dir',
+                path: path + '/' + item
+            })
+    })
+    return items
 }
 
-const sendVideo = (path, type, req, res) => {
-    try {
-        if (fs.existsSync(path)) {
-            const stat = fs.statSync(path)
-            const fileSize = stat.size
-            const range = req.headers.range
-
-            if (range) {
-                const parts = range.replace(/bytes=/, '').split('-')
-                const start = parseInt(parts[0], 10)
-                const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1
-
-                if (start >= fileSize) {
-                    res.status(416).send(
-                        'Requested range not satisfiable\n' +
-                            start +
-                            ' >= ' +
-                            fileSize
-                    )
-                    return
-                }
-
-                const chunksize = end - start + 1
-                const file = fs.createReadStream(path, { start, end })
-                const head = {
-                    'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-                    'Accept-Ranges': 'bytes',
-                    'Content-Length': chunksize,
-                    'Content-Type': 'video/mp4'
-                }
-
-                res.writeHead(206, head)
-                file.pipe(res)
-            } else {
-                const head = {
-                    'Content-Length': fileSize,
-                    'Content-Type': 'video/' + type
-                }
-                res.writeHead(200, head)
-                fs.createReadStream(path).pipe(res)
-            }
+const sendVideo = (path, req, res) => {
+    // const path = 'assets/sample.mp4'
+    const stat = fs.statSync(path)
+    const fileSize = stat.size
+    const range = req.headers.range
+    if (range) {
+        const parts = range.replace(/bytes=/, '').split('-')
+        const start = parseInt(parts[0], 10)
+        const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1
+        const chunksize = end - start + 1
+        const file = fs.createReadStream(path, { start, end })
+        const head = {
+            'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+            'Accept-Ranges': 'bytes',
+            'Content-Length': chunksize,
+            'Content-Type': 'video/mp4'
         }
-    } catch (error) {
-        console.log(error)
+        res.writeHead(206, head)
+        file.pipe(res)
+    } else {
+        const head = {
+            'Content-Length': fileSize,
+            'Content-Type': 'video/mp4'
+        }
+        res.writeHead(200, head)
+        fs.createReadStream(path).pipe(res)
     }
 }
 
 module.exports = {
     videoExt,
-    containTerm,
     rootPath,
     listItems,
     sendVideo

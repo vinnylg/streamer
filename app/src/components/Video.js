@@ -1,13 +1,17 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
 const Video = ({ src, type }) => {
+	useEffect(() => {
+		let videoPlayer = document.getElementById('videoPlayer')
+		videoPlayer.src = src
+		videoPlayer.type = type
+		videoPlayer.load()
+	}, [src, type])
+
 	return (
-		src.length > 0 &&
-		type.length > 0 && (
-			<video id="videoPlayer" controls autoPlay width="80%" height="auto">
-				<source src={src} type={type} />
-			</video>
-		)
+		<video id="videoPlayer" controls autoPlay>
+			<source />
+		</video>
 	)
 }
 
