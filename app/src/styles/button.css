@@ -24,6 +24,7 @@
 	text-decoration: line-through;
 }
 
-.button-disable:hover {
+.button-disable:hover,
+.button-active:hover {
 	cursor: default;
 }

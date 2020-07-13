@@ -13,13 +13,24 @@ const api = axios.create()
 
 const App = () => {
 	const location = useLocation()
-
+	const [windowSize, setWindowSize] = useState({})
 	const [open, setOpen] = useState(false)
 	const [marginLeft, setMarginLeft] = useState('0')
 	const [error, setError] = useState(false)
 	const [items, setItems] = useState([])
 	const [videoPath, setVideoPath] = useState('')
 	const [videoType, setVideoType] = useState('')
+
+	useEffect(() => {
+		const updateSize = () =>
+			setWindowSize({
+				width: window.innerWidth,
+				height: window.innerHeight
+			})
+		updateSize()
+		window.addEventListener('resize', updateSize)
+		return () => window.removeEventListener('resize', updateSize)
+	}, [])
 
 	useEffect(() => {
 		setVideoPath('')
@@ -53,13 +64,13 @@ const App = () => {
 	}, [items, location])
 
 	useEffect(() => {
-		let widthSize = Math.round(window.innerWidth * (300 / 1366))
+		let widthSize = Math.round(windowSize.width * (300 / 1366))
 		if (open) {
 			setMarginLeft(widthSize + 'px')
 		} else {
 			setMarginLeft('0')
 		}
-	}, [open])
+	}, [open, windowSize])
 
 	const toogleNav = () => setOpen(prev => !prev)
 
@@ -72,15 +83,23 @@ const App = () => {
 				toogleNav={toogleNav}
 				items={items}
 			/>
-			<div className="main-container" style={{ marginLeft }}>
+			<div style={{ marginLeft }}>
 				<Header toogleNav={toogleNav} menuOpen={open} />
-				<div className="box">
-					{videoPath && (
-						<Video src={videoPath} type={videoType} items={items} />
-					)}
-					<div>Reproduzidos recentes</div>
-					<div>Favoritos</div>
-					<div>!!! tratar overflow</div>
+				<div
+					className="main-container"
+					style={{ maxHeight: windowSize.height }}
+				>
+					<div className="main-content">
+						<div className="box">
+							{videoPath && (
+								<Video src={videoPath} type={videoType} items={items} />
+							)}
+						</div>
+						<div className="box">
+							<div>Reproduzidos recentes</div>
+							<div>Favoritos</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</React.Fragment>

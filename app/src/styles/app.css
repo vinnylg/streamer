@@ -1,9 +1,15 @@
-.main-container,
+.main-container {
+	height: auto;
+	overflow-y: scroll;
+}
 .box {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	align-content: center;
 	justify-content: center;
-	height: 100%;
+}
+
+.main-content {
+	padding-bottom: 200px; /* Place content 60px from the top */
 }
