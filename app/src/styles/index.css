@@ -12,7 +12,7 @@ body {
 		sans-serif;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
-	display: flex;
+	display: block;
 	text-align: center;
 	color: white;
 	font-size: 14px;
@@ -23,6 +23,7 @@ body {
 	position: fixed;
 	top: 0;
 	left: 0;
+	margin-bottom: 100px;
 }
 
 #root {

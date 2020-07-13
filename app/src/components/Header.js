@@ -6,7 +6,7 @@ import MenuIcon from './MenuIcon'
 
 import '../styles/header.css'
 
-const Header = ({ toogleNav, menuOpen }) => {
+const Header = ({ toogleNav, menuOpen, ...rest }) => {
 	const location = useLocation()
 	const [breadscumb, setBreadscumbs] = useState(null)
 
@@ -40,7 +40,7 @@ const Header = ({ toogleNav, menuOpen }) => {
 	}, [location])
 
 	return (
-		<div className="header" position="sticky">
+		<div {...rest} className="header">
 			<MenuIcon onClick={toogleNav} menuOpen={menuOpen} />
 			<div className="breadscumb">{breadscumb}</div>
 		</div>

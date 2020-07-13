@@ -1,19 +1,16 @@
 .header {
 	display: flex;
-	flex-wrap: wrap;
-	flex-direction: row;
+	flex-flow: column wrap;
 	top: 0;
 	padding: 1vw;
 	background-color: black;
-	width: 100%;
 	min-height: 60px;
 	justify-content: flex-start;
 }
 
-.header .breadscumb {
+.breadscumb {
 	display: flex;
-	flex-wrap: wrap;
-	flex-direction: row;
+	flex-flow: row wrap;
 	width: 100%;
 	justify-content: center;
 }

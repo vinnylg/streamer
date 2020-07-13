@@ -26,7 +26,11 @@ const Video = ({ src, type, items }) => {
 			setCurrentTime(event.target.currentTime)
 		})
 
+		console.log('fui montado')
+
 		return () => {
+			console.log('fui desmontado')
+
 			let videoPlayer = document.getElementById('videoPlayer')
 			videoPlayer.removeEventListener('timeupdate', event => {
 				setCurrentTime(event.target.currentTime)

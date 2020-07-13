@@ -1,7 +1,10 @@
 .main-container {
 	height: auto;
 	overflow-y: scroll;
+	margin: 1vh;
+	padding: 1vh;
 }
+
 .box {
 	display: flex;
 	flex-direction: column;
@@ -10,6 +13,10 @@
 	justify-content: center;
 }
 
-.main-content {
-	padding-bottom: 200px; /* Place content 60px from the top */
+.box-row {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	align-content: center;
+	justify-content: space-around;
 }

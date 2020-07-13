@@ -5,7 +5,7 @@ import axios from 'axios'
 import SideMenu from './components/SideMenu'
 import Header from './components/Header'
 import Video from './components/Video'
-//import Button from './components/Button'
+import Button from './components/Button'
 
 import './styles/app.css'
 
@@ -16,17 +16,21 @@ const App = () => {
 	const [windowSize, setWindowSize] = useState({})
 	const [open, setOpen] = useState(false)
 	const [marginLeft, setMarginLeft] = useState('0')
+	const [headerSize, setHeaderSize] = useState(0)
 	const [error, setError] = useState(false)
 	const [items, setItems] = useState([])
 	const [videoPath, setVideoPath] = useState('')
 	const [videoType, setVideoType] = useState('')
 
 	useEffect(() => {
-		const updateSize = () =>
+		const updateSize = () => {
+			let header = document.getElementById('main-header')
+			setHeaderSize(header.clientHeight)
 			setWindowSize({
 				width: window.innerWidth,
 				height: window.innerHeight
 			})
+		}
 		updateSize()
 		window.addEventListener('resize', updateSize)
 		return () => window.removeEventListener('resize', updateSize)
@@ -64,7 +68,7 @@ const App = () => {
 	}, [items, location])
 
 	useEffect(() => {
-		let widthSize = Math.round(windowSize.width * (300 / 1366))
+		let widthSize = Math.max(Math.round(windowSize.width * (300 / 1366)), 200)
 		if (open) {
 			setMarginLeft(widthSize + 'px')
 		} else {
@@ -84,22 +88,60 @@ const App = () => {
 				items={items}
 			/>
 			<div style={{ marginLeft }}>
-				<Header toogleNav={toogleNav} menuOpen={open} />
+				<Header id="main-header" toogleNav={toogleNav} menuOpen={open} />
 				<div
 					className="main-container"
-					style={{ maxHeight: windowSize.height }}
+					style={{ maxHeight: windowSize.height - headerSize * 2 + 'px' }}
 				>
-					<div className="main-content">
-						<div className="box">
-							{videoPath && (
-								<Video src={videoPath} type={videoType} items={items} />
-							)}
-						</div>
-						<div className="box">
-							<div>Reproduzidos recentes</div>
-							<div>Favoritos</div>
-						</div>
+					<div className="box">
+						{videoPath && (
+							<Video src={videoPath} type={videoType} items={items} />
+						)}
 					</div>
+					<div className="box-row">
+						<Button active={true}>Assistidos</Button>
+						<Button active={true}>Favoritos</Button>
+					</div>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
+					<Button active={true}>Favoritos</Button>
 				</div>
 			</div>
 		</React.Fragment>
