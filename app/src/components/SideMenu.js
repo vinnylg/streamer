@@ -44,7 +44,10 @@ const SideMenu = ({ open, toogleNav, items, width }) => {
 	return (
 		open && (
 			<div className="sidebar" style={{ width }}>
-				<div className="sidebar-content">{listItems}</div>
+				<div className="sidebar-content">
+					<i className="icon-arrow-left" />
+					{listItems}
+				</div>
 			</div>
 		)
 	)

@@ -5,8 +5,8 @@ import '../styles/video.css'
 
 const Video = ({ src, type, items }) => {
 	const [currentItem, setCurrentItem] = useState('')
-	// const [duration, setDuration] = useState(null)
-	// const [currentTime, setCurrentTime] = useState(null)
+	const [duration, setDuration] = useState(null)
+	const [currentTime, setCurrentTime] = useState(null)
 	const [prevPath, setPrevPath] = useState('')
 	const [nextPath, setNextPath] = useState('')
 
@@ -17,6 +17,24 @@ const Video = ({ src, type, items }) => {
 		videoPlayer.src = src
 		videoPlayer.type = type
 		videoPlayer.load()
+
+		videoPlayer.addEventListener('loadedmetadata', event => {
+			setDuration(event.target.duration)
+		})
+
+		videoPlayer.addEventListener('timeupdate', event => {
+			setCurrentTime(event.target.currentTime)
+		})
+
+		return () => {
+			let videoPlayer = document.getElementById('videoPlayer')
+			videoPlayer.removeEventListener('timeupdate', event => {
+				setCurrentTime(event.target.currentTime)
+			})
+			videoPlayer.removeEventListener('loadedmetadata', event => {
+				setDuration(event.target.duration)
+			})
+		}
 	}, [src, type])
 
 	useEffect(() => {
@@ -30,10 +48,12 @@ const Video = ({ src, type, items }) => {
 		items
 	])
 
-	// useEffect(() => {
-	// 	console.log(currentTime)
-	// 	console.log(duration)
-	// }, [currentTime, duration])
+	useEffect(() => {
+		console.log(currentTime)
+		console.log(duration)
+		//duration===currentTime? finished
+		//next -> finished?
+	}, [currentTime, duration])
 
 	return (
 		<div>
@@ -42,6 +62,9 @@ const Video = ({ src, type, items }) => {
 			</video>
 			<div className="video-controls">
 				<Button to={prevPath}>Prev</Button>
+				<Button active={true}>
+					<i className="icon-heart-empty" />
+				</Button>
 				<Button to={nextPath}>Next</Button>
 			</div>
 		</div>

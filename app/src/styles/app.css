@@ -1,28 +1,9 @@
+.main-container,
 .box {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	align-content: center;
 	justify-content: center;
-}
-
-.controls {
-	display: flex;
-}
-
-.controls .item {
-	display: flex;
-	padding: 8px 8px 8px 32px;
-	text-decoration: none;
-	font-size: 18px;
-	color: #818181;
-	display: block;
-	transition: 0.3s;
-}
-
-/* When you mouse over the navigation links, change their color */
-.controls .item:hover {
-	display: flex;
-	color: #f1f1f1;
-	cursor: pointer;
+	height: 100%;
 }

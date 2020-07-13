@@ -21,7 +21,7 @@ const listItems = path => {
             let fullpath = path === '/' ? path + item : path + '/' + item
             items.push({
                 id: i,
-                name: item.replace('-', ' ').toUpperCase(),
+                name: item.replace(/-/g, ' ').toUpperCase(),
                 type: 'dir',
                 path: fullpath
             })

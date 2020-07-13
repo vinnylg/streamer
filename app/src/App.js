@@ -5,6 +5,7 @@ import axios from 'axios'
 import SideMenu from './components/SideMenu'
 import Header from './components/Header'
 import Video from './components/Video'
+//import Button from './components/Button'
 
 import './styles/app.css'
 
@@ -71,12 +72,15 @@ const App = () => {
 				toogleNav={toogleNav}
 				items={items}
 			/>
-			<div style={{ marginLeft }}>
+			<div className="main-container" style={{ marginLeft }}>
 				<Header toogleNav={toogleNav} menuOpen={open} />
 				<div className="box">
 					{videoPath && (
 						<Video src={videoPath} type={videoType} items={items} />
 					)}
+					<div>Reproduzidos recentes</div>
+					<div>Favoritos</div>
+					<div>!!! tratar overflow</div>
 				</div>
 			</div>
 		</React.Fragment>
