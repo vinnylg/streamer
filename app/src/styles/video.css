@@ -1,0 +1,9 @@
+.video-controls {
+	display: inline-flex;
+	width: 100%;
+	justify-content: space-around;
+}
+
+video {
+	max-width: 100%;
+}

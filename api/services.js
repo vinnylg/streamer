@@ -17,13 +17,15 @@ const listItems = path => {
             name = name.join()
             if (videoExt.includes(type))
                 items.push({ id: i, name, type, path: path + '/' + item })
-        } else if (stats.isDirectory())
+        } else if (stats.isDirectory()) {
+            let fullpath = path === '/' ? path + item : path + '/' + item
             items.push({
                 id: i,
                 name: item.replace('-', ' ').toUpperCase(),
                 type: 'dir',
-                path: path + '/' + item
+                path: fullpath
             })
+        }
     })
     return items
 }

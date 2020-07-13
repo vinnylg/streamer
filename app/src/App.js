@@ -8,18 +8,16 @@ import Video from './components/Video'
 
 import './styles/app.css'
 
-const api = axios.create({
-	baseURL: 'http://localhost:5000'
-})
+const api = axios.create()
 
 const App = () => {
 	const location = useLocation()
 
 	const [open, setOpen] = useState(false)
+	const [marginLeft, setMarginLeft] = useState('0')
 	const [error, setError] = useState(false)
 	const [items, setItems] = useState([])
 	const [videoPath, setVideoPath] = useState('')
-	// const [videoPath, setVideoPath] = useState('fairy-tail/season-1/001.mp4')
 	const [videoType, setVideoType] = useState('')
 
 	useEffect(() => {
@@ -45,16 +43,40 @@ const App = () => {
 			})
 	}, [location])
 
+	useEffect(() => {
+		if (items && !location.pathname.includes('.')) {
+			setOpen(true)
+		} else {
+			setOpen(false)
+		}
+	}, [items, location])
+
+	useEffect(() => {
+		let widthSize = Math.round(window.innerWidth * (300 / 1366))
+		if (open) {
+			setMarginLeft(widthSize + 'px')
+		} else {
+			setMarginLeft('0')
+		}
+	}, [open])
+
 	const toogleNav = () => setOpen(prev => !prev)
 
 	return (
 		<React.Fragment>
 			{error && <Redirect to="/" />}
-			<SideMenu open={open} toogleNav={toogleNav} items={items} />
-			<div style={{ marginLeft: open ? '300px' : '0' }}>
-				<Header toogleNav={toogleNav} />
+			<SideMenu
+				open={open}
+				width={marginLeft}
+				toogleNav={toogleNav}
+				items={items}
+			/>
+			<div style={{ marginLeft }}>
+				<Header toogleNav={toogleNav} menuOpen={open} />
 				<div className="box">
-					{videoPath && <Video src={videoPath} type={videoType} />}
+					{videoPath && (
+						<Video src={videoPath} type={videoType} items={items} />
+					)}
 				</div>
 			</div>
 		</React.Fragment>

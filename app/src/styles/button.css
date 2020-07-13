@@ -1,0 +1,29 @@
+.button,
+.button-disable,
+.button-active {
+	padding: 8px;
+	text-decoration: none;
+	font-size: 18px;
+	color: #818181;
+	display: block;
+	transition: 0.3s;
+	background-color: inherit;
+}
+
+/* When you mouse over the navigation links, change their color */
+.button:hover {
+	color: #f1f1f1;
+	cursor: pointer;
+}
+
+.button-active {
+	color: #f1f1f1;
+}
+
+.button-disable {
+	text-decoration: line-through;
+}
+
+.button-disable:hover {
+	cursor: default;
+}
