@@ -21,6 +21,9 @@ const App = () => {
 	const [items, setItems] = useState([])
 	const [videoPath, setVideoPath] = useState('')
 	const [videoType, setVideoType] = useState('')
+	const [watched, setWatched] = useState([])
+	const [favorites, setFavorites] = useState([])
+	const [continueWatching, setContinueWatching] = useState([])
 
 	useEffect(() => {
 		const updateSize = () => {
@@ -60,15 +63,7 @@ const App = () => {
 	}, [location])
 
 	useEffect(() => {
-		if (items && !location.pathname.includes('.')) {
-			setOpen(true)
-		} else {
-			setOpen(false)
-		}
-	}, [items, location])
-
-	useEffect(() => {
-		let widthSize = Math.max(Math.round(windowSize.width * (300 / 1366)), 200)
+		let widthSize = Math.max(Math.round(windowSize.width * (300 / 1366)), 150)
 		if (open) {
 			setMarginLeft(widthSize + 'px')
 		} else {
@@ -77,6 +72,18 @@ const App = () => {
 	}, [open, windowSize])
 
 	const toogleNav = () => setOpen(prev => !prev)
+
+	const getWatched = () => {
+		setFavorites([])
+		//send request to get items in location that are in file .watched
+		setWatched(['assisti 1', 'assisti 2', 'assisti 3'])
+	}
+
+	const getFavorites = () => {
+		setWatched([])
+		//send request to get items in location that are in file .favorites
+		setFavorites(['fav1', 'fav2', 'fav3'])
+	}
 
 	return (
 		<React.Fragment>
@@ -93,55 +100,36 @@ const App = () => {
 					className="main-container"
 					style={{ maxHeight: windowSize.height - headerSize * 2 + 'px' }}
 				>
+					{continueWatching && <div className="box">{continueWatching}</div>}
 					<div className="box">
 						{videoPath && (
 							<Video src={videoPath} type={videoType} items={items} />
 						)}
 					</div>
 					<div className="box-row">
-						<Button active={true}>Assistidos</Button>
-						<Button active={true}>Favoritos</Button>
+						<Button
+							onClick={getWatched}
+							active={watched.length > 0 ? true : false}
+						>
+							Assistidos
+						</Button>
+						<Button
+							onClick={getFavorites}
+							active={favorites.length > 0 ? true : false}
+						>
+							Favoritos
+						</Button>
 					</div>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
-					<Button active={true}>Favoritos</Button>
+					{(watched || favorites) && (
+						<div className="box">
+							{watched.map(item => (
+								<div>{item}</div>
+							))}
+							{favorites.map(item => (
+								<div>{item}</div>
+							))}
+						</div>
+					)}
 				</div>
 			</div>
 		</React.Fragment>

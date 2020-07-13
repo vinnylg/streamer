@@ -18,5 +18,11 @@
 	flex-direction: row;
 	align-items: center;
 	align-content: center;
-	justify-content: space-around;
+	justify-content: center;
+	padding-top: 5vh;
+}
+
+.box-row > * {
+	padding-left: 5vw;
+	padding-right: 5vw;
 }

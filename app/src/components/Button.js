@@ -6,7 +6,11 @@ import '../styles/button.css'
 const Button = ({ onClick, to, children, active, ...rest }) => {
 	// console.log(onClick, to, children)
 	if (onClick && !active)
-		return <button className="button" onClick={onClick} {...rest}></button>
+		return (
+			<button className="button" onClick={onClick} {...rest}>
+				{children}
+			</button>
+		)
 	else if (to && !active)
 		return (
 			<Link className="button" to={to} {...rest}>

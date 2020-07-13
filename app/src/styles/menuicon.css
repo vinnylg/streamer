@@ -1,6 +1,7 @@
 .container {
-	display: inline-block;
+	display: block;
 	cursor: pointer;
+	width: 35px;
 }
 
 .bar1,
