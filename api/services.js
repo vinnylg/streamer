@@ -16,11 +16,16 @@ const listItems = path => {
             let type = name.pop()
             name = name.join()
             if (videoExt.includes(type))
-                items.push({ id: i, name, type, path: path + '/' + item })
+                items.push({
+                    id: stats.dev + '' + stats.ino,
+                    name,
+                    type,
+                    path: path + '/' + item
+                })
         } else if (stats.isDirectory()) {
             let fullpath = path === '/' ? path + item : path + '/' + item
             items.push({
-                id: i,
+                id: stats.dev + '' + stats.ino,
                 name: item.replace(/-/g, ' ').toUpperCase(),
                 type: 'dir',
                 path: fullpath
@@ -31,7 +36,8 @@ const listItems = path => {
 }
 
 const sendVideo = (path, req, res) => {
-    // const path = 'assets/sample.mp4'
+    path = rootPath + path
+    let type = path.split('.')[1]
     const stat = fs.statSync(path)
     const fileSize = stat.size
     const range = req.headers.range
@@ -45,14 +51,14 @@ const sendVideo = (path, req, res) => {
             'Content-Range': `bytes ${start}-${end}/${fileSize}`,
             'Accept-Ranges': 'bytes',
             'Content-Length': chunksize,
-            'Content-Type': 'video/mp4'
+            'Content-Type': 'video/' + type
         }
         res.writeHead(206, head)
         file.pipe(res)
     } else {
         const head = {
             'Content-Length': fileSize,
-            'Content-Type': 'video/mp4'
+            'Content-Type': 'video/' + type
         }
         res.writeHead(200, head)
         fs.createReadStream(path).pipe(res)

@@ -15,7 +15,11 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.use(cors())
 
 app.get('/video', (req, res) => {
-    services.sendVideo('/home/vinny/Videos/' + req.query.path, req, res)
+    try {
+        services.sendVideo(req.query.path, req, res)
+    } catch (err) {
+        res.status(404).json({ err })
+    }
 })
 
 app.get('/list', (req, res) => {
