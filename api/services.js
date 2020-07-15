@@ -5,27 +5,33 @@ const videoExt = ['mpg', 'mpeg', 'avi', 'wmv', 'mov', 'ogg', 'webm', 'mp4']
 const rootPath = '/home/vinny/Videos'
 
 const listItems = path => {
-    let raw = fs
+    const raw = fs
         .readdirSync(rootPath + path)
         .filter(name => name != 'streamer' && name[0] != '.')
-    let items = []
+    const items = []
+    const likes = getLikes()
     raw.forEach((item, i) => {
         let stats = fs.lstatSync(rootPath + path + '/' + item)
+        let id = stats.dev + '' + stats.ino
         if (stats.isFile()) {
             let name = item.split('.')
             let type = name.pop()
+            let liked = false
             name = name.join()
+            if (likes.includes(id))
+                liked = true
             if (videoExt.includes(type))
                 items.push({
-                    id: stats.dev + '' + stats.ino,
+                    id,
                     name,
+                    liked,
                     type,
                     path: path + '/' + item
                 })
         } else if (stats.isDirectory()) {
             let fullpath = path === '/' ? path + item : path + '/' + item
             items.push({
-                id: stats.dev + '' + stats.ino,
+                id,
                 name: item.replace(/-/g, ' ').toUpperCase(),
                 type: 'dir',
                 path: fullpath
@@ -65,9 +71,25 @@ const sendVideo = (path, req, res) => {
     }
 }
 
+const getLikes = () => {
+    let likes = []
+    if (fs.existsSync(rootPath + '/.likes.json')) {
+        let raw = fs.readFileSync(rootPath + '/.likes.json')
+        likes = JSON.parse(raw).data
+    }
+    return likes
+}
+
+const setLikes = (likes) => {
+    let raw = JSON.stringify({ data: likes })
+    fs.writeFileSync(rootPath + '/.likes.json', raw)
+}
+
 module.exports = {
     videoExt,
     rootPath,
     listItems,
-    sendVideo
+    sendVideo,
+    getLikes,
+    setLikes
 }

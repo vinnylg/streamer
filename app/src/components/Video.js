@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import axios from 'axios'
 import Button from './Button'
 
 import '../styles/video.css'
@@ -17,6 +18,8 @@ const Video = ({ src, type, items }) => {
 		videoPlayer.src = src
 		videoPlayer.type = type
 		videoPlayer.load()
+
+		console.log(videoPlayer)
 
 		videoPlayer.addEventListener('loadedmetadata', event => {
 			setDuration(event.target.duration)
@@ -53,11 +56,20 @@ const Video = ({ src, type, items }) => {
 	])
 
 	useEffect(() => {
-		console.log(currentTime)
-		console.log(duration)
+		// console.log(currentTime)
+		// console.log(duration)
 		//duration===currentTime? finished
 		//next -> finished?
 	}, [currentTime, duration])
+
+	const toogleLike = () => {
+		axios.post('/like', { currentItem })
+			.then(({ data }) =>
+				setCurrentItem(data.currentItem)
+			)
+			.catch(err => console.error(err))
+		console.log(currentItem)
+	}
 
 	return (
 		<div>
@@ -66,8 +78,9 @@ const Video = ({ src, type, items }) => {
 			</video>
 			<div className="video-controls">
 				<Button to={prevPath}>Prev</Button>
-				<Button active={true}>
-					<i className="icon-heart-empty" />
+				<Button onClick={toogleLike}>
+					{currentItem && !currentItem.liked && '♡'}
+					{currentItem && currentItem.liked && '♥'}
 				</Button>
 				<Button to={nextPath}>Next</Button>
 			</div>
