@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Redirect, useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import axios from 'axios'
 
 import SideMenu from './components/SideMenu'
@@ -7,17 +7,18 @@ import Header from './components/Header'
 import Video from './components/Video'
 import Button from './components/Button'
 
+import history from './history'
+
 import './styles/app.css'
 
-const api = axios.create()
+const videoExt = ['mpg', 'mpeg', 'avi', 'wmv', 'mov', 'ogg', 'webm', 'mp4']
 
 const App = () => {
 	const location = useLocation()
 	const [windowSize, setWindowSize] = useState({})
 	const [open, setOpen] = useState(false)
-	const [marginLeft, setMarginLeft] = useState('0')
+	const [marginLeft, setMarginLeft] = useState(0)
 	const [headerSize, setHeaderSize] = useState(0)
-	const [error, setError] = useState(false)
 	const [items, setItems] = useState([])
 	const [videoPath, setVideoPath] = useState('')
 	const [videoType, setVideoType] = useState('')
@@ -43,7 +44,8 @@ const App = () => {
 		setVideoPath('')
 		setVideoType('')
 		let pathname = location.pathname
-		if (pathname.includes('.')) {
+		if (pathname.includes('.') && videoExt.includes((pathname.split('.')[1]))) {
+			setOpen(false)
 			setVideoPath('/video?path=' + pathname)
 			setVideoType('video/' + pathname.split('.')[1])
 			pathname = pathname
@@ -51,15 +53,17 @@ const App = () => {
 				.filter(part => !part.includes('.'))
 				.join('/')
 		}
-		api
+		axios
 			.get('/list?path=' + pathname)
 			.then(({ data }) => {
-				setError(false)
 				setItems(data.items)
 			})
 			.catch(err => {
-				setError(true)
+				let parts = pathname.split('/')
+				parts.pop()
+				history.push(parts.join('/'))
 			})
+		setOpen(true)
 	}, [location])
 
 	useEffect(() => {
@@ -87,7 +91,6 @@ const App = () => {
 
 	return (
 		<React.Fragment>
-			{error && <Redirect to="/" />}
 			<SideMenu
 				open={open}
 				width={marginLeft}

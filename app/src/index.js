@@ -5,9 +5,7 @@ import './styles/index.css'
 import App from './App'
 import * as serviceWorker from './serviceWorker'
 
-import { createBrowserHistory } from 'history'
-
-const history = createBrowserHistory()
+import history from './history'
 
 ReactDOM.render(
 	<Router history={history}>
