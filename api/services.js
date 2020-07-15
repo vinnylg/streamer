@@ -85,11 +85,25 @@ const setLikes = (likes) => {
     fs.writeFileSync(rootPath + '/.likes.json', raw)
 }
 
+const getWatched = () => {
+    let watched = []
+    if (fs.existsSync(rootPath + '/.watched.json')) {
+        let raw = fs.readFileSync(rootPath + '/.watched.json')
+        watched = JSON.parse(raw).data
+    }
+    return watched
+}
+const setWatched = (item) => {
+    let raw = JSON.stringify({ data: item })
+    fs.writeFileSync(rootPath + '/.watched.json', raw)
+}
 module.exports = {
     videoExt,
     rootPath,
     listItems,
     sendVideo,
     getLikes,
-    setLikes
+    setLikes,
+    getWatched,
+    setWatched
 }

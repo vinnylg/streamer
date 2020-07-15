@@ -79,14 +79,18 @@ const App = () => {
 
 	const getWatched = () => {
 		setFavorites([])
-		//send request to get items in location that are in file .watched
-		setWatched(['assisti 1', 'assisti 2', 'assisti 3'])
+		axios
+			.get('/watched')
+			.then(({ data }) => setWatched(data.watched))
+			.catch(err => console.error(err))
 	}
 
 	const getFavorites = () => {
 		setWatched([])
-		//send request to get items in location that are in file .favorites
-		setFavorites(['fav1', 'fav2', 'fav3'])
+		axios
+			.get('/likes')
+			.then(({ data }) => setFavorites(data.likes))
+			.catch(err => console.error(err))
 	}
 
 	return (
@@ -126,7 +130,7 @@ const App = () => {
 					{(watched || favorites) && (
 						<div className="box">
 							{watched.map(item => (
-								<div>{item}</div>
+								<div>{item.path}</div>
 							))}
 							{favorites.map(item => (
 								<div>{item}</div>

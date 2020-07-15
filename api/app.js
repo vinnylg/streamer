@@ -34,6 +34,16 @@ app.get('/list', (req, res) => {
     }
 })
 
+app.get('/likes', (req, res) => {
+    try {
+        let likes = services.getLikes()
+        res.json({ likes })
+    } catch (err) {
+        console.log(err)
+        res.status(404).json({ err })
+    }
+})
+
 app.post('/like', (req, res) => {
     try {
         const { currentItem } = req.body
@@ -52,5 +62,34 @@ app.post('/like', (req, res) => {
         res.status(404).json({ err })
     }
 })
+
+
+app.get('/watched', (req, res) => {
+    try {
+        const watched = services.getWatched()
+        res.json({ watched })
+    } catch (err) {
+        console.log(err)
+        res.status(404).json({ err })
+    }
+})
+
+app.post('/watched', (req, res) => {
+    try {
+        const { currentItem } = req.body
+        const watched = services.getWatched()
+        let date = new Date()
+        date = date.toJSON()
+        currentItem.watched = date
+        watched.unshift(currentItem)
+        services.setWatched(watched)
+        res.json({ watched })
+    } catch (err) {
+        console.log(err)
+        res.status(404).json({ err })
+    }
+})
+
+
 
 module.exports = app

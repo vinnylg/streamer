@@ -10,8 +10,10 @@ const Video = ({ src, type, items }) => {
 	const [currentTime, setCurrentTime] = useState(null)
 	const [prevPath, setPrevPath] = useState('')
 	const [nextPath, setNextPath] = useState('')
+	const [watched, setWatch] = useState(false)
 
 	useEffect(() => {
+		setWatch(false)
 		setPrevPath('')
 		setNextPath('')
 		let videoPlayer = document.getElementById('videoPlayer')
@@ -56,11 +58,14 @@ const Video = ({ src, type, items }) => {
 	])
 
 	useEffect(() => {
-		// console.log(currentTime)
-		// console.log(duration)
-		//duration===currentTime? finished
-		//next -> finished?
-	}, [currentTime, duration])
+		if (watched && (currentTime > 0.75 * duration))
+			axios.post('/watched', { currentItem })
+				.then(({ data }) => {
+					console.log(data)
+					setWatch(true)
+				})
+				.catch(err => console.error(err))
+	}, [currentTime, duration, setCurrentItem])
 
 	const toogleLike = () => {
 		axios.post('/like', { currentItem })
@@ -68,7 +73,6 @@ const Video = ({ src, type, items }) => {
 				setCurrentItem(data.currentItem)
 			)
 			.catch(err => console.error(err))
-		console.log(currentItem)
 	}
 
 	return (
