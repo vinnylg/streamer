@@ -42,7 +42,7 @@ const Header = ({ toogleNav, menuOpen, ...rest }) => {
 	return (
 		<div {...rest} className="header">
 			<MenuIcon onClick={toogleNav} menuOpen={menuOpen} />
-			<div className="breadscumb">{breadscumb}</div>
+			{breadscumb && breadscumb.length > 1 && <div className="breadscumb">{breadscumb}</div>}
 		</div>
 	)
 }

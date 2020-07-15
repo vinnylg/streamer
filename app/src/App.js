@@ -109,7 +109,7 @@ const App = () => {
 							<Video src={videoPath} type={videoType} items={items} />
 						)}
 					</div>
-					<div className="box-row">
+					<div className="box box-row">
 						<Button
 							onClick={getWatched}
 							active={watched.length > 0 ? true : false}
