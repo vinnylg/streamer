@@ -46,12 +46,22 @@ const App = () => {
 		let pathname = location.pathname
 		if (pathname.includes('.') && videoExt.includes((pathname.split('.')[1]))) {
 			setOpen(false)
+			setContinueWatching(null)
 			setVideoPath('/video?path=' + pathname)
 			setVideoType('video/' + pathname.split('.')[1])
 			pathname = pathname
 				.split('/')
 				.filter(part => !part.includes('.'))
 				.join('/')
+		} else {
+			axios.get('/watching')
+				.then(({ data }) => {
+					let name = data.watching.path.split('.')[0].split('/')
+					name[name.length - 1] = 'EPISODE ' + name[name.length - 1]
+					name = name.join(' ').replace(/-/g, ' ').toUpperCase()
+					data.watching.name = name
+					setContinueWatching(data.watching)
+				})
 		}
 		axios
 			.get('/list?path=' + pathname)
@@ -63,6 +73,7 @@ const App = () => {
 				parts.pop()
 				history.push(parts.join('/'))
 			})
+
 		setOpen(true)
 	}, [location])
 
@@ -133,7 +144,6 @@ const App = () => {
 					className="main-container"
 					style={{ maxHeight: windowSize.height - headerSize * 2 + 'px' }}
 				>
-					{continueWatching && <div className="box">{continueWatching}</div>}
 					<div className="box">
 						{videoPath && (
 							<Video src={videoPath} type={videoType} items={items} />
@@ -156,13 +166,17 @@ const App = () => {
 					{(watched || liked) && (
 						<div className="box">
 							{watched.map(item => (
-								<Button key={item.id} to={item.path}>{item.name}</Button>
+								<Button key={item.watched} to={item.path}>{item.name}</Button>
 							))}
 							{liked.map(item => (
 								<Button key={item.id} to={item.path}>{item.name}</Button>
 							))}
 						</div>
 					)}
+					{continueWatching && <div className="box" style={{ marginTop: '5vh' }}>
+						<span className="text">Continue watching</span>
+						<Button to={continueWatching.path + '?time=' + continueWatching.watching}>{continueWatching.name}</Button>
+					</div>}
 				</div>
 			</div>
 		</React.Fragment>

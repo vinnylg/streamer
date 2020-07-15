@@ -16,15 +16,14 @@ const listItems = path => {
         if (stats.isFile()) {
             let name = item.split('.')
             let type = name.pop()
-            let liked = false
             name = name.join()
-            if (likes.includes(id))
-                liked = true
-            if (videoExt.includes(type))
+            let liked = likes.find(item => item.id === id)
+            if (liked)
+                items.push(liked)
+            else if (videoExt.includes(type))
                 items.push({
                     id,
                     name,
-                    liked,
                     type,
                     path: path + '/' + item
                 })
@@ -97,6 +96,23 @@ const setWatched = (item) => {
     let raw = JSON.stringify({ data: item })
     fs.writeFileSync(rootPath + '/.watched.json', raw)
 }
+
+const setWatching = (item) => {
+    let raw = JSON.stringify({ data: item })
+    fs.writeFileSync(rootPath + '/.watching.json', raw)
+}
+
+const getWatching = () => {
+    let watching = null
+    if (fs.existsSync(rootPath + '/.watching.json')) {
+        let raw = fs.readFileSync(rootPath + '/.watching.json')
+        watching = JSON.parse(raw).data
+    }
+    return watching
+}
+
+const deleteWatching = () => fs.unlinkSync(rootPath + '/.watching.json')
+
 module.exports = {
     videoExt,
     rootPath,
@@ -105,5 +121,7 @@ module.exports = {
     getLikes,
     setLikes,
     getWatched,
-    setWatched
+    setWatched,
+    setWatching,
+    getWatching
 }

@@ -1,24 +1,36 @@
 import React, { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import axios from 'axios'
 import Button from './Button'
 
 import '../styles/video.css'
 
 const Video = ({ src, type, items }) => {
+	const location = useLocation()
 	const [currentItem, setCurrentItem] = useState('')
 	const [duration, setDuration] = useState(null)
 	const [currentTime, setCurrentTime] = useState(null)
 	const [prevPath, setPrevPath] = useState('')
 	const [nextPath, setNextPath] = useState('')
 	const [watched, setWatch] = useState(false)
+	const [watching, setWatching] = useState(0)
 
 	useEffect(() => {
 		setWatch(false)
+		setWatching(5)
 		setPrevPath('')
 		setNextPath('')
+
+
+
 		let videoPlayer = document.getElementById('videoPlayer')
 		videoPlayer.src = src
 		videoPlayer.type = type
+		if (location.search && location.search.includes('time')) {
+			let time = location.search.split('=')[1]
+			videoPlayer.currentTime = time
+		}
+
 		videoPlayer.load()
 
 		videoPlayer.addEventListener('loadedmetadata', event => {
@@ -39,7 +51,7 @@ const Video = ({ src, type, items }) => {
 				setDuration(event.target.duration)
 			})
 		}
-	}, [src, type])
+	}, [src, type, location])
 
 	useEffect(() => {
 		let index = items.indexOf(currentItem)
@@ -53,19 +65,21 @@ const Video = ({ src, type, items }) => {
 	])
 
 	useEffect(() => {
-		if (!watched && (currentTime > 0.95 * duration))
+		if (!watched && currentTime > watching) {
+			axios.post('/watching', { currentItem, watching })
+				.then(() => setWatching(prev => prev + 5))
+				.catch(err => console.error(err))
+		}
+		if (!watched && (currentTime > watching) && (currentTime > 0.95 * duration)) {
 			axios.post('/watched', { currentItem })
-				.then(({ data }) => {
+				.then(() => {
 					setWatch(true)
 				})
 				.catch(err => console.error(err))
-	}, [currentTime, duration, setCurrentItem])
-
-	const setWatchedWhenNext = () => axios.post('/watched', { currentItem })
-		.then(({ data }) => {
-			setWatch(true)
-		})
-		.catch(err => console.error(err))
+			axios.delete('/watching')
+				.catch(err => console.error(err))
+		}
+	}, [currentTime, currentItem, duration, watching, watched])
 
 
 	const toogleLike = () => {
@@ -87,7 +101,7 @@ const Video = ({ src, type, items }) => {
 					{currentItem && !currentItem.liked && '♡'}
 					{currentItem && currentItem.liked && '♥'}
 				</Button>
-				<Button to={nextPath} onClick={setWatchedWhenNext}>Next</Button>
+				<Button to={nextPath}>Next</Button>
 			</div>
 		</div>
 	)

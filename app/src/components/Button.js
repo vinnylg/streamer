@@ -16,14 +16,6 @@ const Button = ({ onClick, to, children, active, ...rest }) => {
 				{children}
 			</Link>
 		)
-	else if (to && onClick && !active)
-		return (
-			<Link className="button" to={to} {...rest}>
-				<button className="button" onClick={onClick} {...rest}>
-					{children}
-				</button>
-			</Link>
-		)
 	else if (onClick && active) {
 		return (
 			<button className="button button-active-toogle" onClick={onClick} {...rest}>

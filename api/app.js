@@ -69,7 +69,7 @@ app.get('/watched', (req, res) => {
         const watched = services.getWatched()
         res.json({ watched })
     } catch (err) {
-        console.err(err)
+        console.error(err)
         res.status(404).json({ err })
     }
 })
@@ -78,18 +78,48 @@ app.post('/watched', (req, res) => {
     try {
         const { currentItem } = req.body
         const watched = services.getWatched()
-        let date = new Date()
-        date = date.toJSON()
-        currentItem.watched = date
-        watched.unshift(currentItem)
-        services.setWatched(watched)
-        res.json({ watched })
+        if (!watched.find(item => item.id === currentItem.id)) {
+            currentItem.watched = Date.now()
+            watched.unshift(currentItem)
+            services.setWatched(watched)
+        }
+        res.json({})
     } catch (err) {
-        console.err(err)
+        console.error(err)
         res.status(404).json({ err })
     }
 })
 
+app.post('/watching', (req, res) => {
+    try {
+        const { currentItem, watching } = req.body
+        services.setWatching({ ...currentItem, watching })
+        res.status(200).json({})
+    } catch (err) {
+        console.error(err)
+        res.status(404).json({ err })
+    }
+})
+
+app.delete('/watching', (req, res) => {
+    try {
+        services.deleteWatching()
+        res.status(200)
+    } catch (err) {
+        console.error(err)
+        res.status(404).json({ err })
+    }
+})
+
+app.get('/watching', (req, res) => {
+    try {
+        const watching = services.getWatching()
+        res.json({ watching })
+    } catch (err) {
+        console.error(err)
+        res.status(404).json({ err })
+    }
+})
 
 
 module.exports = app
