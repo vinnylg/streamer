@@ -18,7 +18,7 @@ app.get('/video', (req, res) => {
     try {
         services.sendVideo(req.query.path, req, res)
     } catch (err) {
-        console.log(err)
+        console.err(err)
         res.status(404).json({ err })
     }
 })
@@ -29,7 +29,7 @@ app.get('/list', (req, res) => {
         const items = services.listItems(listPath)
         res.json({ items })
     } catch (err) {
-        console.log(err)
+        console.err(err)
         res.status(404).json({ err })
     }
 })
@@ -39,7 +39,7 @@ app.get('/likes', (req, res) => {
         let likes = services.getLikes()
         res.json({ likes })
     } catch (err) {
-        console.log(err)
+        console.err(err)
         res.status(404).json({ err })
     }
 })
@@ -48,17 +48,17 @@ app.post('/like', (req, res) => {
     try {
         const { currentItem } = req.body
         let likes = services.getLikes()
-        if (likes.find(id => id === currentItem.id)) {
-            likes = likes.filter(id => id !== currentItem.id)
+        if (likes.find(({ id }) => id === currentItem.id)) {
+            likes = likes.filter(({ id }) => id !== currentItem.id)
             currentItem.liked = false
         } else {
-            likes.push(currentItem.id)
+            likes.push(currentItem)
             currentItem.liked = true
         }
         services.setLikes(likes)
         res.json({ currentItem })
     } catch (err) {
-        console.log(err)
+        console.err(err)
         res.status(404).json({ err })
     }
 })
@@ -69,7 +69,7 @@ app.get('/watched', (req, res) => {
         const watched = services.getWatched()
         res.json({ watched })
     } catch (err) {
-        console.log(err)
+        console.err(err)
         res.status(404).json({ err })
     }
 })
@@ -85,7 +85,7 @@ app.post('/watched', (req, res) => {
         services.setWatched(watched)
         res.json({ watched })
     } catch (err) {
-        console.log(err)
+        console.err(err)
         res.status(404).json({ err })
     }
 })

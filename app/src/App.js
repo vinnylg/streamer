@@ -23,7 +23,7 @@ const App = () => {
 	const [videoPath, setVideoPath] = useState('')
 	const [videoType, setVideoType] = useState('')
 	const [watched, setWatched] = useState([])
-	const [favorites, setFavorites] = useState([])
+	const [liked, setLiked] = useState([])
 	const [continueWatching, setContinueWatching] = useState([])
 
 	useEffect(() => {
@@ -78,19 +78,45 @@ const App = () => {
 	const toogleNav = () => setOpen(prev => !prev)
 
 	const getWatched = () => {
-		setFavorites([])
-		axios
-			.get('/watched')
-			.then(({ data }) => setWatched(data.watched))
-			.catch(err => console.error(err))
+		setLiked([])
+		if (watched.length > 0)
+			setWatched([])
+		else
+			axios
+				.get('/watched')
+				.then(({ data }) => {
+					const { watched } = data
+					watched.forEach(item => {
+						let name = item.path.split('.')[0].split('/')
+						name[name.length - 1] = 'EPISODE ' + name[name.length - 1]
+						name = name.join(' ').replace(/-/g, ' ').toUpperCase()
+						item.name = name
+					})
+					setWatched(watched)
+				})
+				.catch(err => console.error(err))
 	}
 
-	const getFavorites = () => {
+	const getLiked = () => {
 		setWatched([])
-		axios
-			.get('/likes')
-			.then(({ data }) => setFavorites(data.likes))
-			.catch(err => console.error(err))
+		if (liked.length > 0)
+			setLiked([])
+		else {
+			axios
+				.get('/likes')
+				.then(({ data }) => {
+					const { likes } = data
+					likes.forEach(item => {
+						let name = item.path.split('.')[0].split('/')
+						name[name.length - 1] = 'EPISODE ' + name[name.length - 1]
+						name = name.join(' ').replace(/-/g, ' ').toUpperCase()
+						item.name = name
+					})
+					setLiked(likes)
+				})
+				.catch(err => console.error(err))
+
+		}
 	}
 
 	return (
@@ -121,19 +147,19 @@ const App = () => {
 							Assistidos
 						</Button>
 						<Button
-							onClick={getFavorites}
-							active={favorites.length > 0 ? true : false}
+							onClick={getLiked}
+							active={liked.length > 0 ? true : false}
 						>
 							Favoritos
 						</Button>
 					</div>
-					{(watched || favorites) && (
+					{(watched || liked) && (
 						<div className="box">
 							{watched.map(item => (
-								<div>{item.path}</div>
+								<Button key={item.id} to={item.path}>{item.name}</Button>
 							))}
-							{favorites.map(item => (
-								<div>{item}</div>
+							{liked.map(item => (
+								<Button key={item.id} to={item.path}>{item.name}</Button>
 							))}
 						</div>
 					)}

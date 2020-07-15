@@ -21,8 +21,6 @@ const Video = ({ src, type, items }) => {
 		videoPlayer.type = type
 		videoPlayer.load()
 
-		console.log(videoPlayer)
-
 		videoPlayer.addEventListener('loadedmetadata', event => {
 			setDuration(event.target.duration)
 		})
@@ -31,10 +29,7 @@ const Video = ({ src, type, items }) => {
 			setCurrentTime(event.target.currentTime)
 		})
 
-		console.log('fui montado')
-
 		return () => {
-			console.log('fui desmontado')
 
 			let videoPlayer = document.getElementById('videoPlayer')
 			videoPlayer.removeEventListener('timeupdate', event => {
@@ -58,14 +53,20 @@ const Video = ({ src, type, items }) => {
 	])
 
 	useEffect(() => {
-		if (watched && (currentTime > 0.75 * duration))
+		if (!watched && (currentTime > 0.95 * duration))
 			axios.post('/watched', { currentItem })
 				.then(({ data }) => {
-					console.log(data)
 					setWatch(true)
 				})
 				.catch(err => console.error(err))
 	}, [currentTime, duration, setCurrentItem])
+
+	const setWatchedWhenNext = () => axios.post('/watched', { currentItem })
+		.then(({ data }) => {
+			setWatch(true)
+		})
+		.catch(err => console.error(err))
+
 
 	const toogleLike = () => {
 		axios.post('/like', { currentItem })
@@ -86,7 +87,7 @@ const Video = ({ src, type, items }) => {
 					{currentItem && !currentItem.liked && '♡'}
 					{currentItem && currentItem.liked && '♥'}
 				</Button>
-				<Button to={nextPath}>Next</Button>
+				<Button to={nextPath} onClick={setWatchedWhenNext}>Next</Button>
 			</div>
 		</div>
 	)
