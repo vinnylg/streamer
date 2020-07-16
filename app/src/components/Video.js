@@ -6,7 +6,7 @@ import Button from './Button'
 import '../styles/video.css'
 
 const Video = ({ src, type, items }) => {
-	const location = useLocation()
+	const { pathname } = useLocation()
 	const [currentItem, setCurrentItem] = useState('')
 	const [duration, setDuration] = useState(null)
 	const [currentTime, setCurrentTime] = useState(null)
@@ -21,19 +21,17 @@ const Video = ({ src, type, items }) => {
 		setPrevPath('')
 		setNextPath('')
 
-
-
 		let videoPlayer = document.getElementById('videoPlayer')
 		videoPlayer.src = src
 		videoPlayer.type = type
-		if (location.search && location.search.includes('time')) {
-			let time = location.search.split('=')[1]
-			videoPlayer.currentTime = time
-		}
 
-		videoPlayer.load()
-
-		console.log(videoPlayer)
+		axios.get('/watching')
+			.then(({ data }) => {
+				if (data.watching && data.watching.path === pathname) {
+					let time = data.watching.watching
+					videoPlayer.currentTime = time
+				}
+			})
 
 		videoPlayer.addEventListener('loadedmetadata', event => {
 			setDuration(event.target.duration)
@@ -44,7 +42,6 @@ const Video = ({ src, type, items }) => {
 		})
 
 		return () => {
-
 			let videoPlayer = document.getElementById('videoPlayer')
 			videoPlayer.removeEventListener('timeupdate', event => {
 				setCurrentTime(event.target.currentTime)
@@ -53,7 +50,7 @@ const Video = ({ src, type, items }) => {
 				setDuration(event.target.duration)
 			})
 		}
-	}, [src, type, location])
+	}, [src, type, pathname])
 
 	useEffect(() => {
 		let index = items.indexOf(currentItem)

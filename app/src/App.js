@@ -177,7 +177,7 @@ const App = () => {
 					)}
 					{continueWatching && <div className="box" style={{ marginTop: '5vh' }}>
 						<span className="text">Continue watching</span>
-						<Button to={continueWatching.path + '?time=' + continueWatching.watching}>{continueWatching.name}</Button>
+						<Button to={continueWatching.path}>{continueWatching.name}</Button>
 					</div>}
 				</div>
 			</div>
