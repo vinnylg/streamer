@@ -33,6 +33,8 @@ const Video = ({ src, type, items }) => {
 
 		videoPlayer.load()
 
+		console.log(videoPlayer)
+
 		videoPlayer.addEventListener('loadedmetadata', event => {
 			setDuration(event.target.duration)
 		})

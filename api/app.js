@@ -78,7 +78,8 @@ app.post('/watched', (req, res) => {
     try {
         const { currentItem } = req.body
         const watched = services.getWatched()
-        if (!watched.find(item => item.id === currentItem.id)) {
+        const hasWatched = watched.find(item => item.id === currentItem.id)
+        if (!hasWatched) {
             currentItem.watched = Date.now()
             watched.unshift(currentItem)
             services.setWatched(watched)
@@ -114,7 +115,10 @@ app.delete('/watching', (req, res) => {
 app.get('/watching', (req, res) => {
     try {
         const watching = services.getWatching()
-        res.json({ watching })
+        if (watching)
+            res.json({ watching })
+        else
+            res.json({ watching: null })
     } catch (err) {
         console.error(err)
         res.status(404).json({ err })

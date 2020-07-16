@@ -4,6 +4,7 @@ import axios from 'axios'
 
 import SideMenu from './components/SideMenu'
 import Header from './components/Header'
+import Breadscumbs from './components/Breadscumbs'
 import Video from './components/Video'
 import Button from './components/Button'
 
@@ -11,14 +12,13 @@ import history from './history'
 
 import './styles/app.css'
 
-const videoExt = ['mpg', 'mpeg', 'avi', 'wmv', 'mov', 'ogg', 'webm', 'mp4']
+const videoExt = ['mpg', 'mpeg', 'avi', 'wmv', 'mov', 'ogg', 'webm', 'mp4', 'mkv']
 
 const App = () => {
 	const location = useLocation()
 	const [windowSize, setWindowSize] = useState({})
 	const [open, setOpen] = useState(false)
 	const [marginLeft, setMarginLeft] = useState(0)
-	const [headerSize, setHeaderSize] = useState(0)
 	const [items, setItems] = useState([])
 	const [videoPath, setVideoPath] = useState('')
 	const [videoType, setVideoType] = useState('')
@@ -28,8 +28,6 @@ const App = () => {
 
 	useEffect(() => {
 		const updateSize = () => {
-			let header = document.getElementById('main-header')
-			setHeaderSize(header.clientHeight)
 			setWindowSize({
 				width: window.innerWidth,
 				height: window.innerHeight
@@ -43,10 +41,10 @@ const App = () => {
 	useEffect(() => {
 		setVideoPath('')
 		setVideoType('')
+		setContinueWatching(null)
 		let pathname = location.pathname
 		if (pathname.includes('.') && videoExt.includes((pathname.split('.')[1]))) {
 			setOpen(false)
-			setContinueWatching(null)
 			setVideoPath('/video?path=' + pathname)
 			setVideoType('video/' + pathname.split('.')[1])
 			pathname = pathname
@@ -56,12 +54,16 @@ const App = () => {
 		} else {
 			axios.get('/watching')
 				.then(({ data }) => {
-					let name = data.watching.path.split('.')[0].split('/')
-					name[name.length - 1] = 'EPISODE ' + name[name.length - 1]
-					name = name.join(' ').replace(/-/g, ' ').toUpperCase()
-					data.watching.name = name
-					setContinueWatching(data.watching)
+					if (data.watching) {
+						let name = data.watching.path.split('.')[0].split('/')
+						name[name.length - 1] = 'EPISODE ' + name[name.length - 1]
+						name = name.join(' ').replace(/-/g, ' ').toUpperCase()
+						data.watching.name = name
+						setContinueWatching(data.watching)
+					}
 				})
+			setOpen(true)
+
 		}
 		axios
 			.get('/list?path=' + pathname)
@@ -74,7 +76,6 @@ const App = () => {
 				history.push(parts.join('/'))
 			})
 
-		setOpen(true)
 	}, [location])
 
 	useEffect(() => {
@@ -142,8 +143,9 @@ const App = () => {
 				<Header id="main-header" toogleNav={toogleNav} menuOpen={open} />
 				<div
 					className="main-container"
-					style={{ maxHeight: windowSize.height - headerSize * 2 + 'px' }}
+					style={{ maxHeight: windowSize.height - 80 + 'px' }}
 				>
+					<Breadscumbs />
 					<div className="box">
 						{videoPath && (
 							<Video src={videoPath} type={videoType} items={items} />

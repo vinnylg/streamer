@@ -1,6 +1,6 @@
 var fs = require('fs')
 
-const videoExt = ['mpg', 'mpeg', 'avi', 'wmv', 'mov', 'ogg', 'webm', 'mp4']
+const videoExt = ['mpg', 'mpeg', 'avi', 'wmv', 'mov', 'ogg', 'webm', 'mp4', 'mkv']
 
 const rootPath = '/home/vinny/Videos'
 
@@ -123,5 +123,6 @@ module.exports = {
     getWatched,
     setWatched,
     setWatching,
-    getWatching
+    getWatching,
+    deleteWatching
 }

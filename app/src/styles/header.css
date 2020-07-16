@@ -9,6 +9,7 @@
 }
 
 .breadscumb {
+	padding-bottom: 2vh;
 	display: flex;
 	flex-flow: row wrap;
 	width: 100%;
