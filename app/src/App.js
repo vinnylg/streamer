@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
+import useEventListener from '@use-it/event-listener'
 import axios from 'axios'
 
 import SideMenu from './components/SideMenu'
@@ -26,21 +27,19 @@ const App = () => {
 	const [liked, setLiked] = useState([])
 	const [continueWatching, setContinueWatching] = useState([])
 
-	useEffect(() => {
-		const updateSize = () => {
-			setWindowSize({
-				width: window.innerWidth,
-				height: window.innerHeight
-			})
-		}
-		updateSize()
-		window.addEventListener('resize', updateSize)
-		return () => window.removeEventListener('resize', updateSize)
-	}, [])
+	const updateSize = () => {
+		setWindowSize({
+			width: window.innerWidth,
+			height: window.innerHeight
+		})
+	}
+
+	useEventListener('resize', updateSize)
 
 	useEffect(() => {
-		setVideoPath('')
-		setVideoType('')
+		updateSize()
+		setWatched([])
+		setLiked([])
 		setContinueWatching(null)
 		let pathname = location.pathname
 		if (pathname.includes('.') && videoExt.includes((pathname.split('.')[1]))) {
@@ -62,8 +61,9 @@ const App = () => {
 						setContinueWatching(data.watching)
 					}
 				})
+			setVideoPath('')
+			setVideoType('')
 			setOpen(true)
-
 		}
 		axios
 			.get('/list?path=' + pathname)

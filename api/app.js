@@ -105,7 +105,7 @@ app.post('/watching', (req, res) => {
 app.delete('/watching', (req, res) => {
     try {
         services.deleteWatching()
-        res.status(200)
+        res.status(200).json({})
     } catch (err) {
         console.error(err)
         res.status(404).json({ err })

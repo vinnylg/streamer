@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react'
+import useEventListener from '@use-it/event-listener'
 import { useLocation } from 'react-router-dom'
 import axios from 'axios'
 import Button from './Button'
 
+import history from '../history'
 import '../styles/video.css'
 
 const Video = ({ src, type, items }) => {
@@ -17,7 +19,7 @@ const Video = ({ src, type, items }) => {
 
 	useEffect(() => {
 		setWatch(false)
-		setWatching(5)
+		setWatching(0)
 		setPrevPath('')
 		setNextPath('')
 
@@ -30,27 +32,19 @@ const Video = ({ src, type, items }) => {
 				if (data.watching && data.watching.path === pathname) {
 					let time = data.watching.watching
 					videoPlayer.currentTime = time
+					setWatching(time)
 				}
 			})
 
-		videoPlayer.addEventListener('loadedmetadata', event => {
-			setDuration(event.target.duration)
-		})
-
-		videoPlayer.addEventListener('timeupdate', event => {
-			setCurrentTime(event.target.currentTime)
-		})
-
-		return () => {
-			let videoPlayer = document.getElementById('videoPlayer')
-			videoPlayer.removeEventListener('timeupdate', event => {
-				setCurrentTime(event.target.currentTime)
-			})
-			videoPlayer.removeEventListener('loadedmetadata', event => {
-				setDuration(event.target.duration)
-			})
-		}
 	}, [src, type, pathname])
+
+	useEventListener('loadedmetadata', event => {
+		setDuration(event.target.duration)
+	}, document.getElementById('videoPlayer'))
+
+	useEventListener('timeupdate', event => {
+		setCurrentTime(event.target.currentTime)
+	}, document.getElementById('videoPlayer'))
 
 	useEffect(() => {
 		let index = items.indexOf(currentItem)
@@ -63,20 +57,28 @@ const Video = ({ src, type, items }) => {
 		items
 	])
 
+	const hasWatched = (currentItem) => {
+		axios.post('/watched', { currentItem })
+			.then(() => {
+				setWatch(true)
+			})
+			.catch(err => console.error(err))
+		axios.delete('/watching')
+			.then()
+			.catch(err => console.error(err))
+	}
+
 	useEffect(() => {
-		if (!watched && currentTime > watching) {
-			axios.post('/watching', { currentItem, watching })
-				.then(() => setWatching(prev => prev + 5))
-				.catch(err => console.error(err))
-		}
-		if (!watched && (currentTime > watching) && (currentTime > 0.95 * duration)) {
-			axios.post('/watched', { currentItem })
-				.then(() => {
-					setWatch(true)
-				})
-				.catch(err => console.error(err))
-			axios.delete('/watching')
-				.catch(err => console.error(err))
+		if (!watched) {
+			if (currentTime > watching) {
+				axios.post('/watching', { currentItem, watching })
+					.then(() => setWatching(Math.trunc(currentTime) + 5))
+					.catch(err => console.error(err))
+
+				if ((currentTime > 0.95 * duration)) {
+					hasWatched(currentItem)
+				}
+			}
 		}
 	}, [currentTime, currentItem, duration, watching, watched])
 
@@ -89,18 +91,27 @@ const Video = ({ src, type, items }) => {
 			.catch(err => console.error(err))
 	}
 
+	const toNextPath = () => {
+		hasWatched(currentItem)
+		history.push(nextPath)
+	}
+
+	const toPrevPath = () => {
+		history.push(prevPath)
+	}
+
 	return (
 		<div>
 			<video id="videoPlayer" controls autoPlay>
 				<source src="/" />
 			</video>
 			<div className="video-controls">
-				<Button to={prevPath}>Prev</Button>
+				<Button onClick={toPrevPath}>Prev</Button>
 				<Button onClick={toogleLike}>
 					{currentItem && !currentItem.liked && '♡'}
 					{currentItem && currentItem.liked && '♥'}
 				</Button>
-				<Button to={nextPath}>Next</Button>
+				<Button onClick={toNextPath}>Next</Button>
 			</div>
 		</div>
 	)
