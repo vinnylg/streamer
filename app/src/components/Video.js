@@ -25,6 +25,8 @@ const Video = ({ src, type, items }) => {
 
 		let videoPlayer = document.getElementById('videoPlayer')
 		videoPlayer.src = src
+		if (type === 'mkv')
+			type = 'mp4'
 		videoPlayer.type = type
 
 		axios.get('/watching')

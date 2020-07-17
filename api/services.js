@@ -43,6 +43,8 @@ const listItems = path => {
 const sendVideo = (path, req, res) => {
     path = rootPath + path
     let type = path.split('.')[1]
+    if (type === 'mkv')
+        type = 'mp4'
     const stat = fs.statSync(path)
     const fileSize = stat.size
     const range = req.headers.range
