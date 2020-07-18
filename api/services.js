@@ -113,7 +113,7 @@ const getWatching = () => {
     return watching
 }
 
-const deleteWatching = () => fs.unlinkSync(rootPath + '/.watching.json')
+const deleteWatching = () => fs.existsSync(rootPath + '/.watching.json') && fs.unlinkSync(rootPath + '/.watching.json')
 
 module.exports = {
     videoExt,

@@ -13,12 +13,10 @@ const Video = ({ src, type, items }) => {
 
 	//const ref
 	const videoEl = useRef()
-	// const videoControlsEl = useRef()
-	// const playButtonEl = useRef()
-	// const playbackIconsEl = useRef()
-	// const timeElapsedEl = useRef()
-	// const durationEl = useRef()
-	// const progressBarEl = useRef()
+	const nextSecEl = useRef()
+	const prevSecEl = useRef()
+	const videoControlsEl = useRef()
+	const playButtonEl = useRef()
 	const seekEl = useRef()
 	const seekTooltipEl = useRef()
 	// const volumeButtonEl = useRef()
@@ -27,16 +25,16 @@ const Video = ({ src, type, items }) => {
 	// const volumeLowEl = useRef()
 	// const volumeHighEl = useRef()
 	// const volumeEl = useRef()
-	// const playbackAnimationEl = useRef()
-	// const fullscreenButtonEl = useRef()
-	// const videoContainerEl = useRef()
-	// const fullscreenIconsEl = useRef()
-	// const pipButtonEl = useRef()
+	const playbackAnimationEl = useRef()
+	const fullscreenButtonEl = useRef()
+	const videoContainerEl = useRef()
 
 	//const states values of refs
 	const [duration, setDuration] = useState(0)
 	const [currentTime, setCurrentTime] = useState(0)
 	const [skipTo, setSkipTo] = useState(0)
+	const [timeFormated, setTimeFormated] = useState(null)
+	const [durationFormated, setDurationFormated] = useState(null)
 
 	//const state
 	const [currentItem, setCurrentItem] = useState("")
@@ -48,11 +46,16 @@ const Video = ({ src, type, items }) => {
 	//useLayoutEffect
 
 	//useEffect
-	useEffect(() => {
+	useLayoutEffect(() => {
 		setWatch(false)
 		setWatching(0)
 		setPrevPath("")
 		setNextPath("")
+		setDuration(0)
+		setDurationFormated(null)
+		setCurrentTime(0)
+		setTimeFormated(null)
+		setSkipTo(null)
 
 		videoEl.current.src = src
 		videoEl.current.type = type
@@ -92,8 +95,6 @@ const Video = ({ src, type, items }) => {
 		}
 	}, [currentTime, currentItem, duration, watching, watched])
 
-	useEffect(() => console.log(currentTime), [currentTime])
-
 	//Functions
 	const formatTime = (timeInSeconds) => {
 		if (timeInSeconds) {
@@ -111,15 +112,19 @@ const Video = ({ src, type, items }) => {
 	}
 
 	const initializeVideo = () => {
-		setDuration(videoEl.current.duration)
+		let duration = Math.floor(videoEl.current.duration)
+		setDuration(duration)
+		setDurationFormated(formatTime(duration))
 	}
 
 	const updateTime = () => {
-		setCurrentTime(videoEl.current.currentTime)
+		let time = Math.floor(videoEl.current.currentTime)
+		setCurrentTime(time)
+		setTimeFormated(formatTime(time))
 	}
 
 	const updateSeekValue = () => {
-		let time = seekEl.current.value
+		let time = Math.floor(seekEl.current.value)
 		setCurrentTime(time)
 		videoEl.current.currentTime = time
 	}
@@ -135,6 +140,70 @@ const Video = ({ src, type, items }) => {
 		seekTooltipEl.current.textContent = `${t.minutes}:${t.seconds}`
 		const rect = videoEl.current.getBoundingClientRect()
 		seekTooltipEl.current.style.left = `${event.pageX - rect.left}px`
+	}
+
+	const togglePlay = () => {
+		if (videoEl.current.paused || videoEl.current.ended) {
+			videoEl.current.play()
+		} else {
+			videoEl.current.pause()
+		}
+		animatePlayback()
+	}
+
+	const nextSec = () => {
+		videoEl.current.currentTime += 5
+		setSkipTo(Math.floor(videoEl.current.currentTime))
+	}
+
+	const prevSec = () => {
+		videoEl.current.currentTime -= 5
+		setSkipTo(Math.floor(videoEl.current.currentTime))
+	}
+
+	const updatePlayButton = () => {
+		const playbackIcons = document.querySelectorAll(".playback-icons use")
+		playbackIcons.forEach((icon) => icon.classList.toggle("hidden"))
+	}
+
+	const animatePlayback = () => {
+		playbackAnimationEl.current.animate(
+			[
+				{
+					opacity: 1,
+					transform: "scale(1)",
+				},
+				{
+					opacity: 0,
+					transform: "scale(1.3)",
+				},
+			],
+			{
+				duration: 500,
+			}
+		)
+	}
+
+	const toggleFullScreen = () => {
+		if (document.fullscreenElement) {
+			document.exitFullscreen()
+		} else {
+			videoContainerEl.current.requestFullscreen()
+		}
+		const fullscreenIcons = fullscreenButtonEl.current.querySelectorAll("use")
+		fullscreenIcons.forEach((icon) => icon.classList.toggle("hidden"))
+	}
+
+	const hideControls = () => {
+		if (videoEl.current.paused) {
+			return
+		}
+
+		videoControlsEl.current.classList.add("hide")
+	}
+
+	const showControls = () => {
+		videoControlsEl.current.classList.remove("hide")
 	}
 
 	const hasWatched = (currentItem) => {
@@ -170,28 +239,54 @@ const Video = ({ src, type, items }) => {
 	useEventListener("loadedmetadata", initializeVideo, videoEl.current)
 	useEventListener("timeupdate", updateTime, videoEl.current)
 
+	useEventListener("input", updateSeekValue, seekEl.current)
+
+	useEventListener("play", updatePlayButton, videoEl.current)
+	useEventListener("pause", updatePlayButton, videoEl.current)
+
+	useEventListener("mouseenter", showControls, videoContainerEl.current)
+	useEventListener("mouseleave", hideControls, videoContainerEl.current)
+
+	useEventListener("click", togglePlay, playButtonEl.current)
+
 	useEventListener("mousemove", updateSeekTooltip, seekEl.current)
 	useEventListener("mouseleave", () => setSkipTo(currentTime), seekEl.current)
 
+	useEventListener("click", togglePlay, nextSecEl.current)
+	useEventListener("click", togglePlay, prevSecEl.current)
+	useEventListener("dblclick", nextSec, nextSecEl.current)
+	useEventListener("dblclick", prevSec, prevSecEl.current)
+
+	useEventListener("click", toggleFullScreen, fullscreenButtonEl.current)
+
 	return (
 		<div>
-			<div className="video-container" id="video-container">
-				<div className="playback-animation" id="playback-animation">
+			<div ref={videoContainerEl} className="video-container">
+				<div ref={playbackAnimationEl} className="playback-animation">
 					<svg className="playback-icons">
 						<use className="hidden" href="#play-icon"></use>
 						<use href="#pause"></use>
 					</svg>
+				</div>
+				<div className="inside-controls">
+					<div ref={prevSecEl} className="prev-seconds"></div>
+					<div ref={nextSecEl} className="next-seconds"></div>
 				</div>
 
 				<video ref={videoEl} className="video">
 					<source src="/" />
 				</video>
 
-				<div className="video-controls" id="video-controls">
-					<div className="video-progress">
-						<progress value={currentTime} max={duration}></progress>
+				<div ref={videoControlsEl} className="video-controls">
+					<div className="video-progress-container">
 						<progress
+							className="video-progress seek-progress"
 							value={skipTo ? skipTo : currentTime}
+							max={duration}
+						></progress>
+						<progress
+							className="video-progress"
+							value={currentTime}
 							max={duration}
 						></progress>
 						<input
@@ -200,11 +295,42 @@ const Video = ({ src, type, items }) => {
 							type="range"
 							value={currentTime}
 							max={duration}
-							onChange={() => updateSeekValue()}
 							step="1"
+							readOnly
 						/>
-						<div ref={seekTooltipEl} className="seek-tooltip" id="seek-tooltip">
+						<div ref={seekTooltipEl} className="seek-tooltip">
 							00:00
+						</div>
+					</div>
+					<div className="bottom-controls">
+						<div className="left-controls">
+							<button ref={playButtonEl}>
+								<svg className="playback-icons">
+									<use href="#play-icon"></use>
+									<use className="hidden" href="#pause"></use>
+								</svg>
+							</button>
+							<div className="time">
+								{timeFormated && (
+									<time>
+										{timeFormated.minutes}:{timeFormated.seconds}
+									</time>
+								)}
+								{timeFormated && durationFormated && <span> / </span>}
+								{durationFormated && (
+									<time>
+										{durationFormated.minutes}:{durationFormated.seconds}
+									</time>
+								)}
+							</div>
+						</div>
+						<div className="right-controls">
+							<button ref={fullscreenButtonEl} className="fullscreen-button">
+								<svg>
+									<use href="#fullscreen"></use>
+									<use href="#fullscreen-exit" className="hidden"></use>
+								</svg>
+							</button>
 						</div>
 					</div>
 				</div>

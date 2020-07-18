@@ -12,6 +12,29 @@
 	justify-content: center;
 }
 
+.inside-controls {
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+}
+
+.prev-seconds {
+	width: 50%;
+	height: 100%;
+}
+
+.play-pause {
+	width: 50%;
+	height: 100%;
+}
+
+.next-seconds {
+	width: 50%;
+	height: 100%;
+}
+
 video {
 	width: 100%;
 }
@@ -55,7 +78,7 @@ video {
 	pointer-events: none;
 }
 
-.video-container button::before {
+/* .video-container button::before {
 	content: attr(data-title);
 	position: absolute;
 	display: none;
@@ -67,7 +90,7 @@ video {
 	padding: 4px 6px;
 	word-break: keep-all;
 	white-space: pre;
-}
+} */
 
 .video-container button:hover::before {
 	display: inline-block;
@@ -90,7 +113,7 @@ video {
 	opacity: 0;
 }
 
-.video-progress {
+.video-progress-container {
 	position: relative;
 	border-radius: 4px;
 	height: 4px;
@@ -98,7 +121,7 @@ video {
 	margin-bottom: 10px;
 }
 
-.video-progress progress {
+.video-progress {
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	appearance: none;
@@ -112,23 +135,27 @@ video {
 	background: #474545aa;
 }
 
-.video-progress progress::-webkit-progress-bar {
+.video-progress::-webkit-progress-bar {
 	background-color: #474545;
 	border-radius: 6px;
 	height: 6px;
 }
 
-.video-progress progress::-webkit-progress-value {
+.video-progress::-webkit-progress-value {
 	background: var(--youtube-red);
 	border-radius: 6px;
 	height: 6px;
 }
 
-.video-progress progress::-moz-progress-bar {
+.video-progress::-moz-progress-bar {
 	border: 1px solid var(--youtube-red);
 	background: var(--youtube-red);
 	border-radius: 6px;
 	height: 6px;
+}
+
+.seek-progress::-moz-progress-bar {
+	background: white;
 }
 
 .seek {
@@ -145,6 +172,7 @@ video {
 	background: transparent;
 	font: inherit;
 	-webkit-appearance: none;
+	outline: none;
 }
 
 .seek::-webkit-slider-thumb {
@@ -156,6 +184,7 @@ video {
 	height: 15px;
 	border-radius: 50%;
 	background: var(--youtube-red);
+	outline: none;
 }
 
 .seek::-moz-range-thumb {
@@ -165,6 +194,7 @@ video {
 	height: 15px;
 	border-radius: 50%;
 	background: var(--youtube-red);
+	outline: none;
 }
 
 .seek:hover + .seek-tooltip {
@@ -182,6 +212,23 @@ video {
 	font-weight: bold;
 	color: #fff;
 	background-color: rgba(0, 0, 0, 0.6);
+}
+
+.bottom-controls {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.left-controls {
+	display: flex;
+	align-items: center;
+	color: #fff;
+}
+
+.time {
+	margin-left: 5px;
+	margin-right: 5px;
 }
 
 svg {
