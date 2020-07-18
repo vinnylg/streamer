@@ -1,9 +1,193 @@
-.video-controls {
+.my-controls {
 	display: inline-flex;
 	width: 100%;
 	justify-content: space-around;
 }
 
+.video-container {
+	margin: 0 auto;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
 video {
-	max-width: 100%;
+	width: 100%;
+}
+
+.video-controls {
+	height: auto;
+	right: 0;
+	left: 0;
+	padding: 10px;
+	position: absolute;
+	bottom: 0;
+	transition: all 0.2s ease;
+	background-image: linear-gradient(
+		to bottom,
+		rgba(0, 0, 0, 0),
+		rgba(0, 0, 0, 0.8)
+	);
+}
+
+.video-controls.hide {
+	opacity: 0;
+	pointer-events: none;
+}
+
+.hidden {
+	display: none;
+}
+
+.video-container button {
+	cursor: pointer;
+	position: relative;
+	margin-right: 7px;
+	font-size: 12px;
+	padding: 3px;
+	border: none;
+	outline: none;
+	background-color: transparent;
+}
+
+.video-container button * {
+	pointer-events: none;
+}
+
+.video-container button::before {
+	content: attr(data-title);
+	position: absolute;
+	display: none;
+	right: 0;
+	top: -50px;
+	background-color: rgba(0, 0, 0, 0.6);
+	color: #fff;
+	font-weight: bold;
+	padding: 4px 6px;
+	word-break: keep-all;
+	white-space: pre;
+}
+
+.video-container button:hover::before {
+	display: inline-block;
+}
+
+.playback-animation {
+	pointer-events: none;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin-left: -40px;
+	margin-top: -40px;
+	width: 80px;
+	height: 80px;
+	border-radius: 80px;
+	background-color: rgba(0, 0, 0, 0.6);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	opacity: 0;
+}
+
+.video-progress {
+	position: relative;
+	border-radius: 4px;
+	height: 4px;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.video-progress progress {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	width: 100%;
+	pointer-events: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	border-radius: 6px;
+	height: 6px;
+	background: #474545aa;
+}
+
+.video-progress progress::-webkit-progress-bar {
+	background-color: #474545;
+	border-radius: 6px;
+	height: 6px;
+}
+
+.video-progress progress::-webkit-progress-value {
+	background: var(--youtube-red);
+	border-radius: 6px;
+	height: 6px;
+}
+
+.video-progress progress::-moz-progress-bar {
+	border: 1px solid var(--youtube-red);
+	background: var(--youtube-red);
+	border-radius: 6px;
+	height: 6px;
+}
+
+.seek {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	border-radius: 6px;
+	height: 6px;
+	cursor: pointer;
+	flex: 1;
+	margin: 0;
+	padding: 0;
+	background: transparent;
+	font: inherit;
+	-webkit-appearance: none;
+}
+
+.seek::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	box-sizing: border-box;
+	border: none;
+	margin-top: 0;
+	width: 15px;
+	height: 15px;
+	border-radius: 50%;
+	background: var(--youtube-red);
+}
+
+.seek::-moz-range-thumb {
+	box-sizing: border-box;
+	border: none;
+	width: 15px;
+	height: 15px;
+	border-radius: 50%;
+	background: var(--youtube-red);
+}
+
+.seek:hover + .seek-tooltip {
+	display: block;
+}
+
+.seek-tooltip {
+	display: none;
+	position: absolute;
+	top: -30px;
+	margin-left: -25px;
+	font-size: 12px;
+	padding: 3px;
+	content: attr(data-title);
+	font-weight: bold;
+	color: #fff;
+	background-color: rgba(0, 0, 0, 0.6);
+}
+
+svg {
+	width: 28px;
+	height: 28px;
+	fill: #fff;
+	stroke: #fff;
+	cursor: pointer;
 }
