@@ -19,15 +19,14 @@ const Video = ({ src, type, items }) => {
 	const playButtonEl = useRef()
 	const seekEl = useRef()
 	const seekTooltipEl = useRef()
-	// const volumeButtonEl = useRef()
-	// const volumeIconsEl = useRef()
-	// const volumeMuteEl = useRef()
-	// const volumeLowEl = useRef()
-	// const volumeHighEl = useRef()
-	// const volumeEl = useRef()
+	const volumeButtonEl = useRef()
+	const volumeEl = useRef()
 	const playbackAnimationEl = useRef()
 	const fullscreenButtonEl = useRef()
 	const videoContainerEl = useRef()
+	const nextButtonEl = useRef()
+
+	const timer = useRef(false)
 
 	//const states values of refs
 	const [duration, setDuration] = useState(0)
@@ -35,6 +34,7 @@ const Video = ({ src, type, items }) => {
 	const [skipTo, setSkipTo] = useState(0)
 	const [timeFormated, setTimeFormated] = useState(null)
 	const [durationFormated, setDurationFormated] = useState(null)
+	const [volume, setVolume] = useState(1)
 
 	//const state
 	const [currentItem, setCurrentItem] = useState("")
@@ -206,6 +206,68 @@ const Video = ({ src, type, items }) => {
 		videoControlsEl.current.classList.remove("hide")
 	}
 
+	const hideOnMouseStop = () => {
+		if (videoEl.current.paused) {
+			return
+		}
+		videoContainerEl.current.classList.add("hide-mouse")
+		videoControlsEl.current.classList.add("hide")
+	}
+
+	const setMouseStopTimer = (e) => {
+		showControls()
+		videoContainerEl.current.classList.remove("hide-mouse")
+		clearTimeout(timer.current)
+		timer.current = setTimeout(() => {
+			let event = new CustomEvent("mousestop", {
+				bubbles: true,
+				cancelable: true,
+			})
+			e.target.dispatchEvent(event)
+		}, 2000)
+	}
+
+	const updateVolume = () => {
+		if (videoEl.current.muted) {
+			videoEl.current.muted = false
+		}
+		setVolume(volumeEl.current.value)
+		videoEl.current.volume = volumeEl.current.value
+	}
+
+	const updateVolumeIcon = () => {
+		const volumeIcons = document.querySelectorAll(".volume-button use")
+		const volumeMute = document.querySelector('use[href="#volume-mute"]')
+		const volumeLow = document.querySelector('use[href="#volume-low"]')
+		const volumeHigh = document.querySelector('use[href="#volume-high"]')
+
+		volumeIcons.forEach((icon) => {
+			icon.classList.add("hidden")
+		})
+
+		volumeButtonEl.current.setAttribute("data-title", "Mute (m)")
+
+		if (videoEl.current.muted || videoEl.current.volume === 0) {
+			volumeMute.classList.remove("hidden")
+			volumeButtonEl.current.setAttribute("data-title", "Unmute (m)")
+		} else if (videoEl.current.volume > 0 && videoEl.current.volume <= 0.5) {
+			volumeLow.classList.remove("hidden")
+		} else {
+			volumeHigh.classList.remove("hidden")
+		}
+	}
+
+	const toggleMute = () => {
+		videoEl.current.muted = !videoEl.current.muted
+
+		if (videoEl.current.muted) {
+			volumeEl.current.setAttribute("data-volume", volumeEl.current.value)
+			volumeEl.current.value = 0
+		} else {
+			volumeEl.current.value = volumeEl.current.dataset.volume
+		}
+	}
+
 	const hasWatched = (currentItem) => {
 		axios
 			.post("/watched", { currentItem })
@@ -247,6 +309,10 @@ const Video = ({ src, type, items }) => {
 	useEventListener("mouseenter", showControls, videoContainerEl.current)
 	useEventListener("mouseleave", hideControls, videoContainerEl.current)
 
+	useEventListener("mousemove", setMouseStopTimer, videoContainerEl.current)
+
+	useEventListener("mousestop", hideOnMouseStop, videoContainerEl.current)
+
 	useEventListener("click", togglePlay, playButtonEl.current)
 
 	useEventListener("mousemove", updateSeekTooltip, seekEl.current)
@@ -258,6 +324,12 @@ const Video = ({ src, type, items }) => {
 	useEventListener("dblclick", prevSec, prevSecEl.current)
 
 	useEventListener("click", toggleFullScreen, fullscreenButtonEl.current)
+
+	useEventListener("input", updateVolume, volumeEl.current)
+	useEventListener("volumechange", updateVolumeIcon, videoEl.current)
+	useEventListener("click", toggleMute, volumeButtonEl.current)
+
+	useEventListener("click", toNextPath, nextButtonEl.current)
 
 	return (
 		<div>
@@ -273,7 +345,7 @@ const Video = ({ src, type, items }) => {
 					<div ref={nextSecEl} className="next-seconds"></div>
 				</div>
 
-				<video ref={videoEl} className="video">
+				<video ref={videoEl} className="video" autoPlay>
 					<source src="/" />
 				</video>
 
@@ -323,8 +395,37 @@ const Video = ({ src, type, items }) => {
 									</time>
 								)}
 							</div>
+							<div className="volume-controls">
+								<button
+									ref={volumeButtonEl}
+									data-title="Mute (m)"
+									className="volume-button"
+								>
+									<svg>
+										<use className="hidden" href="#volume-mute"></use>
+										<use className="hidden" href="#volume-low"></use>
+										<use href="#volume-high"></use>
+									</svg>
+								</button>
+
+								<input
+									className="volume"
+									ref={volumeEl}
+									value={volume}
+									type="range"
+									max="1"
+									min="0"
+									step="0.01"
+									readOnly
+								/>
+							</div>
 						</div>
 						<div className="right-controls">
+							<button ref={nextButtonEl} className="next">
+								<svg>
+									<use href="#next-video"></use>
+								</svg>
+							</button>
 							<button ref={fullscreenButtonEl} className="fullscreen-button">
 								<svg>
 									<use href="#fullscreen"></use>
@@ -373,8 +474,11 @@ const Video = ({ src, type, items }) => {
 						<path d="M15.984 8.016h3v1.969h-4.969v-4.969h1.969v3zM14.016 18.984v-4.969h4.969v1.969h-3v3h-1.969zM8.016 8.016v-3h1.969v4.969h-4.969v-1.969h3zM5.016 15.984v-1.969h4.969v4.969h-1.969v-3h-3z"></path>
 					</symbol>
 
-					<symbol id="pip" viewBox="0 0 24 24">
-						<path d="M21 19.031v-14.063h-18v14.063h18zM23.016 18.984q0 0.797-0.609 1.406t-1.406 0.609h-18q-0.797 0-1.406-0.609t-0.609-1.406v-14.016q0-0.797 0.609-1.383t1.406-0.586h18q0.797 0 1.406 0.586t0.609 1.383v14.016zM18.984 11.016v6h-7.969v-6h7.969z"></path>
+					<symbol id="next-video" viewBox="0 0 24 24">
+						<path d="M 12,24 20.5,18 12,12 V 24 z M 22,12 v 12 h 2 V 12 h -2 z"></path>
+					</symbol>
+					<symbol id="forward" viewBox="0 0 24 24">
+						<path d="M0 3.795l2.995-2.98 11.132 11.185-11.132 11.186-2.995-2.981 8.167-8.205-8.167-8.205zm18.04 8.205l-8.167 8.205 2.995 2.98 11.132-11.185-11.132-11.186-2.995 2.98 8.167 8.206z" />
 					</symbol>
 				</defs>
 			</svg>

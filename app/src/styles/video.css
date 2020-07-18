@@ -63,6 +63,10 @@ video {
 	display: none;
 }
 
+.hide-mouse {
+	cursor: none;
+}
+
 .video-container button {
 	cursor: pointer;
 	position: relative;
@@ -226,9 +230,32 @@ video {
 	color: #fff;
 }
 
+.volume-controls {
+	display: flex;
+	align-items: center;
+	margin-right: 10px;
+}
+
+.volume-controls input {
+	width: 100px;
+	opacity: 1;
+	transition: all 0.4s ease;
+}
+
+.volume-controls:hover input,
+.volume-controls input:focus {
+	width: 100px;
+	opacity: 1;
+}
+
 .time {
 	margin-left: 5px;
 	margin-right: 5px;
+}
+
+.next {
+	top: -7px;
+	margin-right: 10px;
 }
 
 svg {
