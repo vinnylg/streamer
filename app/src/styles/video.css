@@ -70,7 +70,8 @@ video {
 .video-container button {
 	cursor: pointer;
 	position: relative;
-	margin-right: 7px;
+	margin-right: 3px;
+	margin-left: 3px;
 	font-size: 12px;
 	padding: 3px;
 	border: none;
@@ -233,6 +234,7 @@ video {
 .volume-controls {
 	display: flex;
 	align-items: center;
+	justify-content: center;
 	margin-right: 10px;
 }
 
@@ -248,14 +250,111 @@ video {
 	opacity: 1;
 }
 
+.volume-container.hide {
+	width: 0;
+	transition: margin 0.2s cubic-bezier(0.4, 0, 1, 1),
+		width 0.2s cubic-bezier(0.4, 0, 1, 1);
+	-webkit-transition: margin 0.2s cubic-bezier(0.4, 0, 1, 1),
+		width 0.2s cubic-bezier(0.4, 0, 1, 1);
+	-moz-transition: margin 0.2s cubic-bezier(0.4, 0, 1, 1),
+		width 0.2s cubic-bezier(0.4, 0, 1, 1);
+}
+
+.volume-container.hide > * {
+	display: none;
+}
+
+.volume-container {
+	position: relative;
+	width: 100px;
+	border-radius: 4px;
+	height: 4px;
+	top: -2px;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	transition: margin 0.2s cubic-bezier(0.4, 0, 1, 1),
+		width 0.2s cubic-bezier(0.4, 0, 1, 1);
+	-webkit-transition: margin 0.2s cubic-bezier(0.4, 0, 1, 1),
+		width 0.2s cubic-bezier(0.4, 0, 1, 1);
+	-moz-transition: margin 0.2s cubic-bezier(0.4, 0, 1, 1),
+		width 0.2s cubic-bezier(0.4, 0, 1, 1);
+}
+
+.volume-progress {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	width: 100%;
+	pointer-events: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	border-radius: 6px;
+	height: 6px;
+	background: #474545aa;
+}
+
+.volume-progress::-webkit-progress-bar {
+	background-color: #474545;
+	border-radius: 6px;
+	height: 6px;
+}
+
+.volume-progress::-webkit-progress-value {
+	background: white;
+	border-radius: 6px;
+	height: 6px;
+}
+
+.volume-progress::-moz-progress-bar {
+	border: 1px solid white;
+	background: white;
+	border-radius: 6px;
+	height: 6px;
+}
+
+.volume {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	border-radius: 6px;
+	height: 6px;
+	cursor: pointer;
+	flex: 1;
+	margin: 0;
+	padding: 0;
+	background: transparent;
+	font: inherit;
+	-webkit-appearance: none;
+	outline: none;
+}
+
+.volume::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	box-sizing: border-box;
+	border: none;
+	margin-top: 0;
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: white;
+	outline: none;
+}
+
+.volume::-moz-range-thumb {
+	box-sizing: border-box;
+	border: none;
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: white;
+	outline: none;
+}
+
 .time {
 	margin-left: 5px;
 	margin-right: 5px;
-}
-
-.next {
-	top: -7px;
-	margin-right: 10px;
 }
 
 svg {

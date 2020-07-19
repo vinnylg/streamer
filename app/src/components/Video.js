@@ -24,8 +24,9 @@ const Video = ({ src, type, items }) => {
 	const playbackAnimationEl = useRef()
 	const fullscreenButtonEl = useRef()
 	const videoContainerEl = useRef()
+	const prevButtonEl = useRef()
 	const nextButtonEl = useRef()
-
+	const volumeContainerEl = useRef()
 	const timer = useRef(false)
 
 	//const states values of refs
@@ -214,6 +215,16 @@ const Video = ({ src, type, items }) => {
 		videoControlsEl.current.classList.add("hide")
 	}
 
+	const showVolumeInput = () => {
+		volumeContainerEl.current.classList.remove("hide")
+	}
+
+	const hideVolumeInput = () => {
+		if (videoEl.current.muted) return
+
+		volumeContainerEl.current.classList.add("hide")
+	}
+
 	const setMouseStopTimer = (e) => {
 		showControls()
 		videoContainerEl.current.classList.remove("hide-mouse")
@@ -329,7 +340,11 @@ const Video = ({ src, type, items }) => {
 	useEventListener("volumechange", updateVolumeIcon, videoEl.current)
 	useEventListener("click", toggleMute, volumeButtonEl.current)
 
+	useEventListener("mouseenter", showVolumeInput, volumeButtonEl.current)
+	useEventListener("mouseleave", hideVolumeInput, videoControlsEl.current)
+
 	useEventListener("click", toNextPath, nextButtonEl.current)
+	useEventListener("click", toPrevPath, prevButtonEl.current)
 
 	return (
 		<div>
@@ -376,12 +391,53 @@ const Video = ({ src, type, items }) => {
 					</div>
 					<div className="bottom-controls">
 						<div className="left-controls">
+							<button ref={prevButtonEl} className="prev">
+								<svg>
+									<use href="#prev-video"></use>
+								</svg>
+							</button>
 							<button ref={playButtonEl}>
 								<svg className="playback-icons">
 									<use href="#play-icon"></use>
 									<use className="hidden" href="#pause"></use>
 								</svg>
 							</button>
+							<button ref={nextButtonEl} className="next">
+								<svg>
+									<use href="#next-video"></use>
+								</svg>
+							</button>
+							<div className="volume-controls">
+								<button
+									ref={volumeButtonEl}
+									data-title="Mute (m)"
+									className="volume-button"
+								>
+									<svg>
+										<use className="hidden" href="#volume-mute"></use>
+										<use className="hidden" href="#volume-low"></use>
+										<use href="#volume-high"></use>
+									</svg>
+								</button>
+								<div ref={volumeContainerEl} className="volume-container">
+									<progress
+										className="volume-progress"
+										value={volume}
+										max="1"
+										min="0"
+									></progress>
+									<input
+										className="volume"
+										ref={volumeEl}
+										value={volume}
+										type="range"
+										max="1"
+										min="0"
+										step="0.01"
+										readOnly
+									/>
+								</div>
+							</div>
 							<div className="time">
 								{timeFormated && (
 									<time>
@@ -395,37 +451,8 @@ const Video = ({ src, type, items }) => {
 									</time>
 								)}
 							</div>
-							<div className="volume-controls">
-								<button
-									ref={volumeButtonEl}
-									data-title="Mute (m)"
-									className="volume-button"
-								>
-									<svg>
-										<use className="hidden" href="#volume-mute"></use>
-										<use className="hidden" href="#volume-low"></use>
-										<use href="#volume-high"></use>
-									</svg>
-								</button>
-
-								<input
-									className="volume"
-									ref={volumeEl}
-									value={volume}
-									type="range"
-									max="1"
-									min="0"
-									step="0.01"
-									readOnly
-								/>
-							</div>
 						</div>
 						<div className="right-controls">
-							<button ref={nextButtonEl} className="next">
-								<svg>
-									<use href="#next-video"></use>
-								</svg>
-							</button>
 							<button ref={fullscreenButtonEl} className="fullscreen-button">
 								<svg>
 									<use href="#fullscreen"></use>
@@ -477,6 +504,11 @@ const Video = ({ src, type, items }) => {
 					<symbol id="next-video" viewBox="0 0 24 24">
 						<path d="M 12,24 20.5,18 12,12 V 24 z M 22,12 v 12 h 2 V 12 h -2 z"></path>
 					</symbol>
+
+					<symbol id="prev-video" viewBox="0 0 24 24">
+						<path d="m 12,12 h 2 v 12 h -2 z m 3.5,6 8.5,6 V 12 z"></path>
+					</symbol>
+
 					<symbol id="forward" viewBox="0 0 24 24">
 						<path d="M0 3.795l2.995-2.98 11.132 11.185-11.132 11.186-2.995-2.981 8.167-8.205-8.167-8.205zm18.04 8.205l-8.167 8.205 2.995 2.98 11.132-11.185-11.132-11.186-2.995 2.98 8.167 8.206z" />
 					</symbol>
