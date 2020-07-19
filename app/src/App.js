@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { useLocation } from "react-router-dom"
 import useEventListener from "@use-it/event-listener"
-import axios from "axios"
 
 import SideMenu from "./components/SideMenu"
 import Header from "./components/Header"
@@ -10,6 +9,7 @@ import Video from "./components/Video"
 import Button from "./components/Button"
 
 import history from "./history"
+import axios from "./api"
 
 import "./styles/app.css"
 

@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useLayoutEffect, useRef } from "react"
 import useEventListener from "@use-it/event-listener"
 import { useLocation } from "react-router-dom"
-import axios from "axios"
 import Button from "./Button"
 
+import axios from "../api"
 import history from "../history"
 import "../styles/video.css"
 
@@ -61,7 +61,7 @@ const Video = ({ src, type, items }) => {
 		setTimeFormated(null)
 		setSkipTo(null)
 
-		videoEl.current.src = src
+		videoEl.current.src = axios.defaults.baseURL + src
 		videoEl.current.type = type
 
 		axios.get("/watching").then(({ data }) => {
