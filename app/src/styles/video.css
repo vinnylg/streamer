@@ -18,21 +18,25 @@
 	width: 100%;
 	display: flex;
 	flex-direction: row;
+	z-index: 1;
 }
 
-.prev-seconds {
-	width: 50%;
+.rewind {
+	width: 25%;
 	height: 100%;
+	z-index: 1;
 }
 
 .play-pause {
 	width: 50%;
 	height: 100%;
+	z-index: 1;
 }
 
-.next-seconds {
-	width: 50%;
+.forward {
+	width: 25%;
 	height: 100%;
+	z-index: 1;
 }
 
 video {
@@ -52,6 +56,7 @@ video {
 		rgba(0, 0, 0, 0),
 		rgba(0, 0, 0, 0.8)
 	);
+	z-index: 2;
 }
 
 .video-controls.hide {
@@ -106,6 +111,40 @@ video {
 	position: absolute;
 	top: 50%;
 	left: 50%;
+	margin-left: -40px;
+	margin-top: -40px;
+	width: 80px;
+	height: 80px;
+	border-radius: 80px;
+	background-color: rgba(0, 0, 0, 0.6);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	opacity: 0;
+}
+
+.forward-animation {
+	pointer-events: none;
+	position: absolute;
+	top: 50%;
+	left: 75%;
+	margin-left: -40px;
+	margin-top: -40px;
+	width: 80px;
+	height: 80px;
+	border-radius: 80px;
+	background-color: rgba(0, 0, 0, 0.6);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	opacity: 0;
+}
+
+.rewind-animation {
+	pointer-events: none;
+	position: absolute;
+	top: 50%;
+	left: 25%;
 	margin-left: -40px;
 	margin-top: -40px;
 	width: 80px;
@@ -363,4 +402,16 @@ svg {
 	fill: #fff;
 	stroke: #fff;
 	cursor: pointer;
+}
+
+.modal {
+	display: none; /* Hidden by default */
+	position: fixed; /* Stay in place */
+	z-index: 1; /* Sit on top */
+	left: 0;
+	top: 0;
+	width: 100%; /* Full width */
+	height: 100%; /* Full height */
+	background-color: rgb(0, 0, 0); /* Fallback color */
+	background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
 }

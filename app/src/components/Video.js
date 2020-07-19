@@ -13,8 +13,9 @@ const Video = ({ src, type, items }) => {
 
 	//const ref
 	const videoEl = useRef()
-	const nextSecEl = useRef()
-	const prevSecEl = useRef()
+	const forwardEl = useRef()
+	const rewindEl = useRef()
+	const playEl = useRef()
 	const videoControlsEl = useRef()
 	const playButtonEl = useRef()
 	const seekEl = useRef()
@@ -22,6 +23,8 @@ const Video = ({ src, type, items }) => {
 	const volumeButtonEl = useRef()
 	const volumeEl = useRef()
 	const playbackAnimationEl = useRef()
+	const forwardAnimationEl = useRef()
+	const rewindAnimationEl = useRef()
 	const fullscreenButtonEl = useRef()
 	const videoContainerEl = useRef()
 	const prevButtonEl = useRef()
@@ -152,13 +155,43 @@ const Video = ({ src, type, items }) => {
 		animatePlayback()
 	}
 
-	const nextSec = () => {
+	const forward = () => {
 		videoEl.current.currentTime += 5
+		forwardAnimationEl.current.animate(
+			[
+				{
+					opacity: 1,
+					transform: "scale(1)",
+				},
+				{
+					opacity: 0,
+					transform: "scale(1.3)",
+				},
+			],
+			{
+				duration: 500,
+			}
+		)
 		setSkipTo(Math.floor(videoEl.current.currentTime))
 	}
 
-	const prevSec = () => {
+	const rewind = () => {
 		videoEl.current.currentTime -= 5
+		rewindAnimationEl.current.animate(
+			[
+				{
+					opacity: 1,
+					transform: "scale(1)",
+				},
+				{
+					opacity: 0,
+					transform: "scale(1.3)",
+				},
+			],
+			{
+				duration: 500,
+			}
+		)
 		setSkipTo(Math.floor(videoEl.current.currentTime))
 	}
 
@@ -185,7 +218,7 @@ const Video = ({ src, type, items }) => {
 		)
 	}
 
-	const toggleFullScreen = () => {
+	const toggleFullScreen = (e) => {
 		if (document.fullscreenElement) {
 			document.exitFullscreen()
 		} else {
@@ -256,11 +289,8 @@ const Video = ({ src, type, items }) => {
 			icon.classList.add("hidden")
 		})
 
-		volumeButtonEl.current.setAttribute("data-title", "Mute (m)")
-
 		if (videoEl.current.muted || videoEl.current.volume === 0) {
 			volumeMute.classList.remove("hidden")
-			volumeButtonEl.current.setAttribute("data-title", "Unmute (m)")
 		} else if (videoEl.current.volume > 0 && videoEl.current.volume <= 0.5) {
 			volumeLow.classList.remove("hidden")
 		} else {
@@ -276,6 +306,43 @@ const Video = ({ src, type, items }) => {
 			volumeEl.current.value = 0
 		} else {
 			volumeEl.current.value = volumeEl.current.dataset.volume
+		}
+	}
+
+	const keyboardShortcuts = (event) => {
+		const { key } = event
+		switch (key) {
+			case " ":
+				togglePlay()
+				animatePlayback()
+				if (videoEl.current.paused) {
+					showControls()
+				} else {
+					setTimeout(() => {
+						hideControls()
+					}, 2000)
+				}
+				break
+			case "m":
+				toggleMute()
+				break
+			case "f":
+				toggleFullScreen()
+				break
+			case "n":
+				if (nextPath) toNextPath()
+				break
+			case "p":
+				if (prevPath) toPrevPath()
+				break
+			case "ArrowRight":
+				forward()
+				break
+			case "ArrowLeft":
+				rewind()
+				break
+			default:
+				break
 		}
 	}
 
@@ -329,10 +396,10 @@ const Video = ({ src, type, items }) => {
 	useEventListener("mousemove", updateSeekTooltip, seekEl.current)
 	useEventListener("mouseleave", () => setSkipTo(currentTime), seekEl.current)
 
-	useEventListener("click", togglePlay, nextSecEl.current)
-	useEventListener("click", togglePlay, prevSecEl.current)
-	useEventListener("dblclick", nextSec, nextSecEl.current)
-	useEventListener("dblclick", prevSec, prevSecEl.current)
+	useEventListener("click", togglePlay, playEl.current)
+	useEventListener("dblclick", toggleFullScreen, playEl.current)
+	useEventListener("dblclick", forward, forwardEl.current)
+	useEventListener("dblclick", rewind, rewindEl.current)
 
 	useEventListener("click", toggleFullScreen, fullscreenButtonEl.current)
 
@@ -345,6 +412,7 @@ const Video = ({ src, type, items }) => {
 
 	useEventListener("click", toNextPath, nextButtonEl.current)
 	useEventListener("click", toPrevPath, prevButtonEl.current)
+	useEventListener("keyup", keyboardShortcuts)
 
 	return (
 		<div>
@@ -355,9 +423,20 @@ const Video = ({ src, type, items }) => {
 						<use href="#pause"></use>
 					</svg>
 				</div>
+				<div ref={forwardAnimationEl} className="forward-animation">
+					<svg className="playback-icons">
+						<use className="hidden" href="#forward"></use>
+					</svg>
+				</div>
+				<div ref={rewindAnimationEl} className="rewind-animation">
+					<svg className="playback-icons">
+						<use className="hidden" href="#rewind"></use>
+					</svg>
+				</div>
 				<div className="inside-controls">
-					<div ref={prevSecEl} className="prev-seconds"></div>
-					<div ref={nextSecEl} className="next-seconds"></div>
+					<div ref={rewindEl} className="forward"></div>
+					<div ref={playEl} className="play-pause"></div>
+					<div ref={forwardEl} className="rewind"></div>
 				</div>
 
 				<video ref={videoEl} className="video" autoPlay>
@@ -391,28 +470,28 @@ const Video = ({ src, type, items }) => {
 					</div>
 					<div className="bottom-controls">
 						<div className="left-controls">
-							<button ref={prevButtonEl} className="prev">
-								<svg>
-									<use href="#prev-video"></use>
-								</svg>
-							</button>
+							{prevPath && (
+								<button ref={prevButtonEl} className="prev">
+									<svg>
+										<use href="#prev-video"></use>
+									</svg>
+								</button>
+							)}
 							<button ref={playButtonEl}>
 								<svg className="playback-icons">
 									<use href="#play-icon"></use>
 									<use className="hidden" href="#pause"></use>
 								</svg>
 							</button>
-							<button ref={nextButtonEl} className="next">
-								<svg>
-									<use href="#next-video"></use>
-								</svg>
-							</button>
+							{nextPath && (
+								<button ref={nextButtonEl} className="next">
+									<svg>
+										<use href="#next-video"></use>
+									</svg>
+								</button>
+							)}
 							<div className="volume-controls">
-								<button
-									ref={volumeButtonEl}
-									data-title="Mute (m)"
-									className="volume-button"
-								>
+								<button ref={volumeButtonEl} className="volume-button">
 									<svg>
 										<use className="hidden" href="#volume-mute"></use>
 										<use className="hidden" href="#volume-low"></use>
@@ -502,15 +581,23 @@ const Video = ({ src, type, items }) => {
 					</symbol>
 
 					<symbol id="next-video" viewBox="0 0 24 24">
-						<path d="M 12,24 20.5,18 12,12 V 24 z M 22,12 v 12 h 2 V 12 h -2 z"></path>
+						<path d="m15.779846,12l-9.719605,6.578313l0,-13.156626l9.719605,6.578313zm2.159912,-6.03012l-2.159912,0l0,12.060241l2.159912,0l0,-12.060241z" />
 					</symbol>
 
 					<symbol id="prev-video" viewBox="0 0 24 24">
-						<path d="m 12,12 h 2 v 12 h -2 z m 3.5,6 8.5,6 V 12 z"></path>
+						<path
+							transform="rotate(-180 12,12) "
+							d="m15.779846,12l-9.719605,6.578313l0,-13.156626l9.719605,6.578313zm2.159912,-6.03012l-2.159912,0l0,12.060241l2.159912,0l0,-12.060241z"
+						/>
 					</symbol>
-
 					<symbol id="forward" viewBox="0 0 24 24">
-						<path d="M0 3.795l2.995-2.98 11.132 11.185-11.132 11.186-2.995-2.981 8.167-8.205-8.167-8.205zm18.04 8.205l-8.167 8.205 2.995 2.98 11.132-11.185-11.132-11.186-2.995 2.98 8.167 8.206z" />
+						<path d="m2.46085,6.453345l2.380813,-2.014507l8.849152,7.561163l-8.849152,7.561839l-2.380813,-2.015183l6.492187,-5.546655l-6.492187,-5.546655zm14.340523,5.546655l-6.492187,5.546655l2.380813,2.014507l8.849152,-7.561163l-8.849152,-7.561839l-2.380813,2.014507l6.492187,5.547331z" />
+					</symbol>
+					<symbol id="rewind" viewBox="0 0 24 24">
+						<path
+							transform="rotate(180 12,11.999999046325684) "
+							d="m2.46085,6.453344l2.380813,-2.014507l8.849152,7.561163l-8.849152,7.561839l-2.380813,-2.015183l6.492187,-5.546655l-6.492187,-5.546655zm14.340523,5.546655l-6.492187,5.546655l2.380813,2.014507l8.849152,-7.561163l-8.849152,-7.561839l-2.380813,2.014507l6.492187,5.547331z"
+						/>
 					</symbol>
 				</defs>
 			</svg>
