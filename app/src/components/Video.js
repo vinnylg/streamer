@@ -15,9 +15,9 @@ const Video = ({ src, type, items }) => {
 	const videoEl = useRef()
 	const forwardEl = useRef()
 	const rewindEl = useRef()
+	const nameEl = useRef()
 	const playEl = useRef()
 	const videoControlsEl = useRef()
-	const playButtonEl = useRef()
 	const seekEl = useRef()
 	const seekTooltipEl = useRef()
 	const volumeButtonEl = useRef()
@@ -27,8 +27,6 @@ const Video = ({ src, type, items }) => {
 	const rewindAnimationEl = useRef()
 	const fullscreenButtonEl = useRef()
 	const videoContainerEl = useRef()
-	const prevButtonEl = useRef()
-	const nextButtonEl = useRef()
 	const volumeContainerEl = useRef()
 	const timer = useRef(false)
 
@@ -79,10 +77,16 @@ const Video = ({ src, type, items }) => {
 		if (index < items.length - 1) setNextPath(items[index + 1].path)
 	}, [items, currentItem])
 
-	useEffect(
-		() => setCurrentItem(items.find((item) => src.includes(item.path))),
-		[src, items]
-	)
+	useEffect(() => {
+		let item = items.find((i) => src.includes(i.path))
+		if (item) {
+			let name = item.path.split(".")[0].split("/")
+			name[name.length - 1] = "EPISODE " + name[name.length - 1]
+			name = name.join(" ").replace(/-/g, " ").toUpperCase()
+			item.name = name
+			setCurrentItem(item)
+		}
+	}, [src, items])
 
 	useEffect(() => {
 		if (!watched) {
@@ -198,6 +202,8 @@ const Video = ({ src, type, items }) => {
 	const updatePlayButton = () => {
 		const playbackIcons = document.querySelectorAll(".playback-icons use")
 		playbackIcons.forEach((icon) => icon.classList.toggle("hidden"))
+		if (videoEl.current.paused) nameEl.current.classList.remove("hide")
+		else nameEl.current.classList.add("hide")
 	}
 
 	const animatePlayback = () => {
@@ -253,7 +259,7 @@ const Video = ({ src, type, items }) => {
 	}
 
 	const hideVolumeInput = () => {
-		if (videoEl.current.muted) return
+		if (videoEl.current.volume === 0) return
 
 		volumeContainerEl.current.classList.add("hide")
 	}
@@ -391,8 +397,6 @@ const Video = ({ src, type, items }) => {
 
 	useEventListener("mousestop", hideOnMouseStop, videoContainerEl.current)
 
-	useEventListener("click", togglePlay, playButtonEl.current)
-
 	useEventListener("mousemove", updateSeekTooltip, seekEl.current)
 	useEventListener("mouseleave", () => setSkipTo(currentTime), seekEl.current)
 
@@ -410,8 +414,6 @@ const Video = ({ src, type, items }) => {
 	useEventListener("mouseenter", showVolumeInput, volumeButtonEl.current)
 	useEventListener("mouseleave", hideVolumeInput, videoControlsEl.current)
 
-	useEventListener("click", toNextPath, nextButtonEl.current)
-	useEventListener("click", toPrevPath, prevButtonEl.current)
 	useEventListener("keyup", keyboardShortcuts)
 
 	return (
@@ -471,20 +473,20 @@ const Video = ({ src, type, items }) => {
 					<div className="bottom-controls">
 						<div className="left-controls">
 							{prevPath && (
-								<button ref={prevButtonEl} className="prev">
+								<button onClick={toPrevPath} className="prev">
 									<svg>
 										<use href="#prev-video"></use>
 									</svg>
 								</button>
 							)}
-							<button ref={playButtonEl}>
+							<button onClick={togglePlay}>
 								<svg className="playback-icons">
 									<use href="#play-icon"></use>
 									<use className="hidden" href="#pause"></use>
 								</svg>
 							</button>
 							{nextPath && (
-								<button ref={nextButtonEl} className="next">
+								<button onClick={toNextPath} className="next">
 									<svg>
 										<use href="#next-video"></use>
 									</svg>
@@ -498,7 +500,7 @@ const Video = ({ src, type, items }) => {
 										<use href="#volume-high"></use>
 									</svg>
 								</button>
-								<div ref={volumeContainerEl} className="volume-container">
+								<div ref={volumeContainerEl} className="volume-container hide">
 									<progress
 										className="volume-progress"
 										value={volume}
@@ -517,21 +519,28 @@ const Video = ({ src, type, items }) => {
 									/>
 								</div>
 							</div>
+							{currentItem && (
+								<div className="name" ref={nameEl}>
+									{currentItem.name}
+								</div>
+							)}
+						</div>
+						<div className="right-controls">
 							<div className="time">
-								{timeFormated && (
+								{timeFormated && currentTime > 0 && (
 									<time>
 										{timeFormated.minutes}:{timeFormated.seconds}
 									</time>
 								)}
-								{timeFormated && durationFormated && <span> / </span>}
+								{timeFormated && durationFormated && currentTime > 0 && (
+									<span> / </span>
+								)}
 								{durationFormated && (
 									<time>
 										{durationFormated.minutes}:{durationFormated.seconds}
 									</time>
 								)}
 							</div>
-						</div>
-						<div className="right-controls">
 							<button ref={fullscreenButtonEl} className="fullscreen-button">
 								<svg>
 									<use href="#fullscreen"></use>

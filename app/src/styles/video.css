@@ -59,7 +59,13 @@ video {
 	z-index: 2;
 }
 
-.video-controls.hide {
+.name,
+.time {
+	font-weight: bold;
+}
+
+.video-controls.hide,
+.name.hide {
 	opacity: 0;
 	pointer-events: none;
 }
@@ -270,6 +276,11 @@ video {
 	color: #fff;
 }
 
+.right-controls {
+	display: flex;
+	align-items: center;
+}
+
 .volume-controls {
 	display: flex;
 	align-items: center;
@@ -392,6 +403,7 @@ video {
 }
 
 .time {
+	display: flex;
 	margin-left: 5px;
 	margin-right: 5px;
 }
