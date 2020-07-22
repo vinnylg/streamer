@@ -201,9 +201,32 @@ const Video = ({ src, type, items }) => {
 
 	const updatePlayButton = () => {
 		const playbackIcons = document.querySelectorAll(".playback-icons use")
-		playbackIcons.forEach((icon) => icon.classList.toggle("hidden"))
-		if (videoEl.current.paused) nameEl.current.classList.remove("hide")
-		else nameEl.current.classList.add("hide")
+		const animationIcons = document.querySelectorAll(".animation-icons use")
+
+		playbackIcons.forEach((icon) => {
+			if (videoEl.current.paused) {
+				if (icon.href.baseVal !== "#pause") icon.classList.remove("hidden")
+				else icon.classList.add("hidden")
+			} else {
+				if (icon.href.baseVal !== "#pause") icon.classList.add("hidden")
+				else icon.classList.remove("hidden")
+			}
+		})
+		animationIcons.forEach((icon) => {
+			if (videoEl.current.paused) {
+				if (icon.href.baseVal === "#pause") icon.classList.remove("hidden")
+				else icon.classList.add("hidden")
+			} else {
+				if (icon.href.baseVal === "#pause") icon.classList.add("hidden")
+				else icon.classList.remove("hidden")
+			}
+		})
+
+		if (videoEl.current.paused) {
+			nameEl.current.classList.remove("hide")
+		} else {
+			nameEl.current.classList.add("hide")
+		}
 	}
 
 	const animatePlayback = () => {
@@ -353,11 +376,10 @@ const Video = ({ src, type, items }) => {
 	}
 
 	const hasWatched = (currentItem) => {
+		setWatch(true)
 		axios
 			.post("/watched", { currentItem })
-			.then(() => {
-				setWatch(true)
-			})
+			.then()
 			.catch((err) => console.error(err))
 		axios
 			.delete("/watching")
@@ -420,18 +442,18 @@ const Video = ({ src, type, items }) => {
 		<div>
 			<div ref={videoContainerEl} className="video-container">
 				<div ref={playbackAnimationEl} className="playback-animation">
-					<svg className="playback-icons">
+					<svg className="animation-icons">
 						<use className="hidden" href="#play-icon"></use>
 						<use href="#pause"></use>
 					</svg>
 				</div>
 				<div ref={forwardAnimationEl} className="forward-animation">
-					<svg className="playback-icons">
+					<svg>
 						<use className="hidden" href="#forward"></use>
 					</svg>
 				</div>
 				<div ref={rewindAnimationEl} className="rewind-animation">
-					<svg className="playback-icons">
+					<svg>
 						<use className="hidden" href="#rewind"></use>
 					</svg>
 				</div>
