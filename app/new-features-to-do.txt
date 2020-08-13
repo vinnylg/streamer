@@ -1,0 +1,11 @@
+* Fix buttons
+* Fix time
+* Fix next and prev possible errors
+* Create database for users, watching, watched, likes
+* Create playback rate speed
+* Modification some internal logical about strings 
+* Create pw2 services to lauch 
+* Create ngix to servers
+* Redirect MIMETYPE videos to app anyware that its run
+* Convert videos to supported formated in all browsers (MP4)
+* That is all, i think
