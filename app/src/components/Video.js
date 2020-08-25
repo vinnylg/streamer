@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useLayoutEffect, useRef } from "react"
-import useEventListener from "@use-it/event-listener"
-import { useLocation } from "react-router-dom"
-import Button from "./Button"
+import React, { useEffect, useState, useLayoutEffect, useRef } from 'react'
+import useEventListener from '@use-it/event-listener'
+import { useLocation } from 'react-router-dom'
+import Button from './Button'
 
-import axios from "../api"
-import history from "../history"
-import "../styles/video.css"
+import axios from '../api'
+import history from '../history'
+import '../styles/video.css'
 
 const Video = ({ src, type, items }) => {
 	//const hooks
@@ -37,11 +37,12 @@ const Video = ({ src, type, items }) => {
 	const [timeFormated, setTimeFormated] = useState(null)
 	const [durationFormated, setDurationFormated] = useState(null)
 	const [volume, setVolume] = useState(1)
+	const [currentSpeed, setCurrentSpeed] = useState(1)
 
 	//const state
-	const [currentItem, setCurrentItem] = useState("")
-	const [prevPath, setPrevPath] = useState("")
-	const [nextPath, setNextPath] = useState("")
+	const [currentItem, setCurrentItem] = useState('')
+	const [prevPath, setPrevPath] = useState('')
+	const [nextPath, setNextPath] = useState('')
 	const [watched, setWatch] = useState(false)
 	const [watching, setWatching] = useState(0)
 
@@ -51,18 +52,19 @@ const Video = ({ src, type, items }) => {
 	useLayoutEffect(() => {
 		setWatch(false)
 		setWatching(0)
-		setPrevPath("")
-		setNextPath("")
+		setPrevPath('')
+		setNextPath('')
 		setDuration(0)
 		setDurationFormated(null)
 		setCurrentTime(0)
 		setTimeFormated(null)
 		setSkipTo(null)
+		setCurrentSpeed(1)
 
 		videoEl.current.src = axios.defaults.baseURL + src
 		videoEl.current.type = type
 
-		axios.get("/watching").then(({ data }) => {
+		axios.get('/watching').then(({ data }) => {
 			if (data.watching && data.watching.path === pathname) {
 				let time = data.watching.watching
 				videoEl.current.currentTime = time
@@ -80,9 +82,9 @@ const Video = ({ src, type, items }) => {
 	useEffect(() => {
 		let item = items.find((i) => src.includes(i.path))
 		if (item) {
-			let name = item.path.split(".")[0].split("/")
-			name[name.length - 1] = "EPISODE " + name[name.length - 1]
-			name = name.join(" ").replace(/-/g, " ").toUpperCase()
+			let name = item.path.split('.')[0].split('/')
+			name[name.length - 1] = 'EPISODE ' + name[name.length - 1]
+			name = name.join(' ').replace(/-/g, ' ').toUpperCase()
 			item.name = name
 			setCurrentItem(item)
 		}
@@ -92,7 +94,7 @@ const Video = ({ src, type, items }) => {
 		if (!watched) {
 			if (currentTime > watching) {
 				axios
-					.post("/watching", { currentItem, watching })
+					.post('/watching', { currentItem, watching })
 					.then(() => setWatching(Math.trunc(currentTime) + 5))
 					.catch((err) => console.error(err))
 
@@ -107,16 +109,27 @@ const Video = ({ src, type, items }) => {
 	const formatTime = (timeInSeconds) => {
 		if (timeInSeconds) {
 			const result = new Date(timeInSeconds * 1000).toISOString().substr(11, 8)
-
 			return {
-				minutes: result.substr(3, 2),
+				hour: result.substr(0,3),
+				minutes: result.substr(3, 3),
 				seconds: result.substr(6, 2),
 			}
 		} else
 			return {
+				hour: 0,
 				minutes: 0,
 				seconds: 0,
 			}
+	}
+
+	const addPlaybackSpeed = () => {
+		videoEl.current.playbackRate = currentSpeed + 0.25
+		setCurrentSpeed(videoEl.current.playbackRate)
+	}
+
+	const subPlaybackSpeed = () => {
+		videoEl.current.playbackRate = currentSpeed - 0.25
+		setCurrentSpeed(videoEl.current.playbackRate)
 	}
 
 	const initializeVideo = () => {
@@ -140,12 +153,12 @@ const Video = ({ src, type, items }) => {
 	const updateSeekTooltip = (event) => {
 		const skipTo = Math.round(
 			(event.offsetX / event.target.clientWidth) *
-				parseInt(event.target.getAttribute("max"), 10)
+				parseInt(event.target.getAttribute('max'), 10)
 		)
 		setSkipTo(skipTo)
-		seekEl.current.setAttribute("data-seek", skipTo)
+		seekEl.current.setAttribute('data-seek', skipTo)
 		const t = formatTime(skipTo)
-		seekTooltipEl.current.textContent = `${t.minutes}:${t.seconds}`
+		seekTooltipEl.current.textContent = t.hour !== '00:' ? `${t.hour}${t.minutes}${t.seconds}` : `${t.minutes}${t.seconds}`
 		const rect = videoEl.current.getBoundingClientRect()
 		seekTooltipEl.current.style.left = `${event.pageX - rect.left}px`
 	}
@@ -165,11 +178,11 @@ const Video = ({ src, type, items }) => {
 			[
 				{
 					opacity: 1,
-					transform: "scale(1)",
+					transform: 'scale(1)',
 				},
 				{
 					opacity: 0,
-					transform: "scale(1.3)",
+					transform: 'scale(1.3)',
 				},
 			],
 			{
@@ -185,11 +198,11 @@ const Video = ({ src, type, items }) => {
 			[
 				{
 					opacity: 1,
-					transform: "scale(1)",
+					transform: 'scale(1)',
 				},
 				{
 					opacity: 0,
-					transform: "scale(1.3)",
+					transform: 'scale(1.3)',
 				},
 			],
 			{
@@ -200,32 +213,32 @@ const Video = ({ src, type, items }) => {
 	}
 
 	const updatePlayButton = () => {
-		const playbackIcons = document.querySelectorAll(".playback-icons use")
-		const animationIcons = document.querySelectorAll(".animation-icons use")
+		const playbackIcons = document.querySelectorAll('.playback-icons use')
+		const animationIcons = document.querySelectorAll('.animation-icons use')
 
 		playbackIcons.forEach((icon) => {
 			if (videoEl.current.paused) {
-				if (icon.href.baseVal !== "#pause") icon.classList.remove("hidden")
-				else icon.classList.add("hidden")
+				if (icon.href.baseVal !== '#pause') icon.classList.remove('hidden')
+				else icon.classList.add('hidden')
 			} else {
-				if (icon.href.baseVal !== "#pause") icon.classList.add("hidden")
-				else icon.classList.remove("hidden")
+				if (icon.href.baseVal !== '#pause') icon.classList.add('hidden')
+				else icon.classList.remove('hidden')
 			}
 		})
 		animationIcons.forEach((icon) => {
 			if (videoEl.current.paused) {
-				if (icon.href.baseVal === "#pause") icon.classList.remove("hidden")
-				else icon.classList.add("hidden")
+				if (icon.href.baseVal === '#pause') icon.classList.remove('hidden')
+				else icon.classList.add('hidden')
 			} else {
-				if (icon.href.baseVal === "#pause") icon.classList.add("hidden")
-				else icon.classList.remove("hidden")
+				if (icon.href.baseVal === '#pause') icon.classList.add('hidden')
+				else icon.classList.remove('hidden')
 			}
 		})
 
 		if (videoEl.current.paused) {
-			nameEl.current.classList.remove("hide")
+			nameEl.current.classList.remove('hide')
 		} else {
-			nameEl.current.classList.add("hide")
+			nameEl.current.classList.add('hide')
 		}
 	}
 
@@ -234,11 +247,11 @@ const Video = ({ src, type, items }) => {
 			[
 				{
 					opacity: 1,
-					transform: "scale(1)",
+					transform: 'scale(1)',
 				},
 				{
 					opacity: 0,
-					transform: "scale(1.3)",
+					transform: 'scale(1.3)',
 				},
 			],
 			{
@@ -253,8 +266,8 @@ const Video = ({ src, type, items }) => {
 		} else {
 			videoContainerEl.current.requestFullscreen()
 		}
-		const fullscreenIcons = fullscreenButtonEl.current.querySelectorAll("use")
-		fullscreenIcons.forEach((icon) => icon.classList.toggle("hidden"))
+		const fullscreenIcons = fullscreenButtonEl.current.querySelectorAll('use')
+		fullscreenIcons.forEach((icon) => icon.classList.toggle('hidden'))
 	}
 
 	const hideControls = () => {
@@ -262,37 +275,37 @@ const Video = ({ src, type, items }) => {
 			return
 		}
 
-		videoControlsEl.current.classList.add("hide")
+		videoControlsEl.current.classList.add('hide')
 	}
 
 	const showControls = () => {
-		videoControlsEl.current.classList.remove("hide")
+		videoControlsEl.current.classList.remove('hide')
 	}
 
 	const hideOnMouseStop = () => {
 		if (videoEl.current.paused) {
 			return
 		}
-		videoContainerEl.current.classList.add("hide-mouse")
-		videoControlsEl.current.classList.add("hide")
+		videoContainerEl.current.classList.add('hide-mouse')
+		videoControlsEl.current.classList.add('hide')
 	}
 
 	const showVolumeInput = () => {
-		volumeContainerEl.current.classList.remove("hide")
+		volumeContainerEl.current.classList.remove('hide')
 	}
 
 	const hideVolumeInput = () => {
 		if (videoEl.current.volume === 0) return
 
-		volumeContainerEl.current.classList.add("hide")
+		volumeContainerEl.current.classList.add('hide')
 	}
 
 	const setMouseStopTimer = (e) => {
 		showControls()
-		videoContainerEl.current.classList.remove("hide-mouse")
+		videoContainerEl.current.classList.remove('hide-mouse')
 		clearTimeout(timer.current)
 		timer.current = setTimeout(() => {
-			let event = new CustomEvent("mousestop", {
+			let event = new CustomEvent('mousestop', {
 				bubbles: true,
 				cancelable: true,
 			})
@@ -309,21 +322,21 @@ const Video = ({ src, type, items }) => {
 	}
 
 	const updateVolumeIcon = () => {
-		const volumeIcons = document.querySelectorAll(".volume-button use")
+		const volumeIcons = document.querySelectorAll('.volume-button use')
 		const volumeMute = document.querySelector('use[href="#volume-mute"]')
 		const volumeLow = document.querySelector('use[href="#volume-low"]')
 		const volumeHigh = document.querySelector('use[href="#volume-high"]')
 
 		volumeIcons.forEach((icon) => {
-			icon.classList.add("hidden")
+			icon.classList.add('hidden')
 		})
 
 		if (videoEl.current.muted || videoEl.current.volume === 0) {
-			volumeMute.classList.remove("hidden")
+			volumeMute.classList.remove('hidden')
 		} else if (videoEl.current.volume > 0 && videoEl.current.volume <= 0.5) {
-			volumeLow.classList.remove("hidden")
+			volumeLow.classList.remove('hidden')
 		} else {
-			volumeHigh.classList.remove("hidden")
+			volumeHigh.classList.remove('hidden')
 		}
 	}
 
@@ -331,7 +344,7 @@ const Video = ({ src, type, items }) => {
 		videoEl.current.muted = !videoEl.current.muted
 
 		if (videoEl.current.muted) {
-			volumeEl.current.setAttribute("data-volume", volumeEl.current.value)
+			volumeEl.current.setAttribute('data-volume', volumeEl.current.value)
 			volumeEl.current.value = 0
 		} else {
 			volumeEl.current.value = volumeEl.current.dataset.volume
@@ -341,55 +354,55 @@ const Video = ({ src, type, items }) => {
 	const keyboardShortcuts = (event) => {
 		const { key } = event
 		switch (key) {
-			case " ":
-				togglePlay()
-				animatePlayback()
-				if (videoEl.current.paused) {
-					showControls()
-				} else {
-					setTimeout(() => {
-						hideControls()
-					}, 2000)
-				}
-				break
-			case "m":
-				toggleMute()
-				break
-			case "f":
-				toggleFullScreen()
-				break
-			case "n":
-				if (nextPath) toNextPath()
-				break
-			case "p":
-				if (prevPath) toPrevPath()
-				break
-			case "ArrowRight":
-				forward()
-				break
-			case "ArrowLeft":
-				rewind()
-				break
-			default:
-				break
+		case ' ':
+			togglePlay()
+			animatePlayback()
+			if (videoEl.current.paused) {
+				showControls()
+			} else {
+				setTimeout(() => {
+					hideControls()
+				}, 2000)
+			}
+			break
+		case 'm':
+			toggleMute()
+			break
+		case 'f':
+			toggleFullScreen()
+			break
+		case 'n':
+			if (nextPath) toNextPath()
+			break
+		case 'p':
+			if (prevPath) toPrevPath()
+			break
+		case 'ArrowRight':
+			forward()
+			break
+		case 'ArrowLeft':
+			rewind()
+			break
+		default:
+			break
 		}
 	}
 
 	const hasWatched = (currentItem) => {
 		setWatch(true)
 		axios
-			.post("/watched", { currentItem })
+			.post('/watched', { currentItem })
 			.then()
 			.catch((err) => console.error(err))
 		axios
-			.delete("/watching")
+			.delete('/watching')
 			.then()
 			.catch((err) => console.error(err))
 	}
 
 	const toogleLike = () => {
 		axios
-			.post("/like", { currentItem })
+			.post('/like', { currentItem })
 			.then(({ data }) => setCurrentItem(data.currentItem))
 			.catch((err) => console.error(err))
 	}
@@ -404,39 +417,39 @@ const Video = ({ src, type, items }) => {
 	}
 
 	//Listeners
-	useEventListener("loadedmetadata", initializeVideo, videoEl.current)
-	useEventListener("timeupdate", updateTime, videoEl.current)
+	useEventListener('loadedmetadata', initializeVideo, videoEl.current)
+	useEventListener('timeupdate', updateTime, videoEl.current)
 
-	useEventListener("input", updateSeekValue, seekEl.current)
+	useEventListener('input', updateSeekValue, seekEl.current)
 
-	useEventListener("play", updatePlayButton, videoEl.current)
-	useEventListener("pause", updatePlayButton, videoEl.current)
+	useEventListener('play', updatePlayButton, videoEl.current)
+	useEventListener('pause', updatePlayButton, videoEl.current)
 
-	useEventListener("mouseenter", showControls, videoContainerEl.current)
-	useEventListener("mouseleave", hideControls, videoContainerEl.current)
+	useEventListener('mouseenter', showControls, videoContainerEl.current)
+	useEventListener('mouseleave', hideControls, videoContainerEl.current)
 
-	useEventListener("mousemove", setMouseStopTimer, videoContainerEl.current)
+	useEventListener('mousemove', setMouseStopTimer, videoContainerEl.current)
 
-	useEventListener("mousestop", hideOnMouseStop, videoContainerEl.current)
+	useEventListener('mousestop', hideOnMouseStop, videoContainerEl.current)
 
-	useEventListener("mousemove", updateSeekTooltip, seekEl.current)
-	useEventListener("mouseleave", () => setSkipTo(currentTime), seekEl.current)
+	useEventListener('mousemove', updateSeekTooltip, seekEl.current)
+	useEventListener('mouseleave', () => setSkipTo(currentTime), seekEl.current)
 
-	useEventListener("click", togglePlay, playEl.current)
-	useEventListener("dblclick", toggleFullScreen, playEl.current)
-	useEventListener("dblclick", forward, forwardEl.current)
-	useEventListener("dblclick", rewind, rewindEl.current)
+	useEventListener('click', togglePlay, playEl.current)
+	useEventListener('dblclick', toggleFullScreen, playEl.current)
+	useEventListener('dblclick', forward, forwardEl.current)
+	useEventListener('dblclick', rewind, rewindEl.current)
 
-	useEventListener("click", toggleFullScreen, fullscreenButtonEl.current)
+	useEventListener('click', toggleFullScreen, fullscreenButtonEl.current)
 
-	useEventListener("input", updateVolume, volumeEl.current)
-	useEventListener("volumechange", updateVolumeIcon, videoEl.current)
-	useEventListener("click", toggleMute, volumeButtonEl.current)
+	useEventListener('input', updateVolume, volumeEl.current)
+	useEventListener('volumechange', updateVolumeIcon, videoEl.current)
+	useEventListener('click', toggleMute, volumeButtonEl.current)
 
-	useEventListener("mouseenter", showVolumeInput, volumeButtonEl.current)
-	useEventListener("mouseleave", hideVolumeInput, videoControlsEl.current)
+	useEventListener('mouseenter', showVolumeInput, volumeButtonEl.current)
+	useEventListener('mouseleave', hideVolumeInput, videoControlsEl.current)
 
-	useEventListener("keyup", keyboardShortcuts)
+	useEventListener('keyup', keyboardShortcuts)
 
 	return (
 		<div>
@@ -449,12 +462,12 @@ const Video = ({ src, type, items }) => {
 				</div>
 				<div ref={forwardAnimationEl} className="forward-animation">
 					<svg>
-						<use className="hidden" href="#forward"></use>
+						<use href="#forward"></use>
 					</svg>
 				</div>
 				<div ref={rewindAnimationEl} className="rewind-animation">
 					<svg>
-						<use className="hidden" href="#rewind"></use>
+						<use href="#rewind"></use>
 					</svg>
 				</div>
 				<div className="inside-controls">
@@ -548,10 +561,24 @@ const Video = ({ src, type, items }) => {
 							)}
 						</div>
 						<div className="right-controls">
+							<div className="speed">
+								<button onClick={subPlaybackSpeed}>
+									<svg>
+										<use href="#prev-video"></use>
+									</svg>
+								</button>
+								<button>{currentSpeed}x</button>
+								<button onClick={addPlaybackSpeed}>
+									<svg>
+										<use href="#next-video"></use>
+									</svg>
+								</button>
+
+							</div>
 							<div className="time">
 								{timeFormated && currentTime > 0 && (
 									<time>
-										{timeFormated.minutes}:{timeFormated.seconds}
+										{timeFormated.hour !== '00:' && timeFormated.hour}{timeFormated.minutes}{timeFormated.seconds}
 									</time>
 								)}
 								{timeFormated && durationFormated && currentTime > 0 && (
@@ -559,7 +586,7 @@ const Video = ({ src, type, items }) => {
 								)}
 								{durationFormated && (
 									<time>
-										{durationFormated.minutes}:{durationFormated.seconds}
+										{durationFormated.hour !== '00:' && durationFormated.hour}{durationFormated.minutes}{durationFormated.seconds}
 									</time>
 								)}
 							</div>
@@ -576,12 +603,12 @@ const Video = ({ src, type, items }) => {
 			<div className="my-controls">
 				<Button onClick={toPrevPath}>Prev</Button>
 				<Button onClick={toogleLike}>
-					{currentItem && !currentItem.liked && "♡"}
-					{currentItem && currentItem.liked && "♥"}
+					{currentItem && !currentItem.liked && '♡'}
+					{currentItem && currentItem.liked && '♥'}
 				</Button>
 				<Button onClick={toNextPath}>Next</Button>
 			</div>
-			<svg style={{ display: "none" }}>
+			<svg style={{ display: 'none' }}>
 				<defs>
 					<symbol id="pause" viewBox="0 0 24 24">
 						<path d="M14.016 5.016h3.984v13.969h-3.984v-13.969zM6 18.984v-13.969h3.984v13.969h-3.984z"></path>
